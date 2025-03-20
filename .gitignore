@@ -11,3 +11,6 @@ wheels/
 
 # macOS index files
 *.DS_Store
+
+# Datasets
+sample-image/
