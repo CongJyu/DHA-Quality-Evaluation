@@ -67,5 +67,3 @@ def dehaze(im):
     for i in range(3):
         result[:, :, i] = (img[:, :, i] - atom) / trans_guided + atom
     return result * 255
-
-
