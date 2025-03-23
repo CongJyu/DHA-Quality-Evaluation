@@ -83,24 +83,24 @@ def dehaze(img_input, img_output):
 
 
 # 数据集测试
-input_path = "./hazed-image"
-output_path = "./dehazed-image"
-input_path_list = os.listdir(input_path)
-input_path_list.remove('.DS_Store')
-output_path_list = os.listdir(output_path)
-output_path_list.remove('.DS_Store')
+def dark_channel_prior_test():
+    input_path = "./hazed-image"
+    output_path = "./dehazed-image"
+    input_path_list = os.listdir(input_path)
+    input_path_list.remove('.DS_Store')
+    output_path_list = os.listdir(output_path)
+    output_path_list.remove('.DS_Store')
 
-for file_name in input_path_list:
-    input_hazed_image = os.path.join(input_path, file_name)
-    output_dehazed_image = os.path.join(output_path, file_name)
-    print("[ INFO ] Processing image: ", file_name)
-    dehaze(input_hazed_image, output_dehazed_image)
+    for file_name in input_path_list:
+        input_hazed_image = os.path.join(input_path, file_name)
+        output_dehazed_image = os.path.join(output_path, file_name)
+        print("[ INFO ] Processing image: ", file_name)
+        dehaze(input_hazed_image, output_dehazed_image)
 
-
-# opencv 读取图像的颜色通道顺序是 [B, G, R]
 # 测试图像读取并对比显示
 # hazed_image = cv2.imread(input_path)
 # dehazed_image = cv2.imread(output_path)
+# dehaze(hazed_image, dehazed_image)
 # cv2.imshow("dark channel prior dehazing - original", hazed_image)
 # cv2.imshow("dark channel prior dehazing - processed", dehazed_image)
 # cv2.waitKey(0)
