@@ -13,4 +13,5 @@ wheels/
 *.DS_Store
 
 # Datasets
-sample-image/
+hazed-image/
+dehazed-image/

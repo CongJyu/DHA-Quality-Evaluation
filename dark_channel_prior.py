@@ -4,8 +4,8 @@
 import cv2
 import numpy as np
 
-input_path = "./sample-image/haze.jpg"
-output_path = "./sample-image/dehaze.jpg"
+input_path = "./hazed-image/haze-4.jpg"
+output_path = "./dehazed-image/dehaze-4.jpg"
 
 
 # 根据 Kaiming He 的论文描述求取图像的暗通道
