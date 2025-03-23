@@ -1,8 +1,8 @@
-# 暗通道先验去雾
+# 暗通道先验去雾 复现
+# 湖南大学 信息科学与工程学院 通信工程 陈昶宇
 
 import cv2
 import numpy as np
-import time
 
 input_path = "./sample-image/haze.jpg"
 output_path = "./sample-image/dehaze.jpg"
@@ -48,10 +48,10 @@ def guided_filter(p, i, r, e):
     # return: filtering output q
 
     # 1
-    mean_i = cv2.boxFilter(i, cv2.CV_64F, (r, r))
-    mean_p = cv2.boxFilter(p, cv2.CV_64F, (r, r))
-    corr_i = cv2.boxFilter(i * i, cv2.CV_64F, (r, r))
-    corr_ip = cv2.boxFilter(i * p, cv2.CV_64F, (r, r))
+    mean_i = cv2.boxFilter(i, cv2.CV_32F, (r, r))
+    mean_p = cv2.boxFilter(p, cv2.CV_32F, (r, r))
+    corr_i = cv2.boxFilter(i * i, cv2.CV_32F, (r, r))
+    corr_ip = cv2.boxFilter(i * p, cv2.CV_32F, (r, r))
     # 2
     var_i = corr_i - mean_i * mean_i
     cov_ip = corr_ip - mean_i * mean_p
@@ -59,8 +59,8 @@ def guided_filter(p, i, r, e):
     a = cov_ip / (var_i + e)
     b = mean_p - a * mean_i
     # 4
-    mean_a = cv2.boxFilter(a, cv2.CV_64F, (r, r))
-    mean_b = cv2.boxFilter(b, cv2.CV_64F, (r, r))
+    mean_a = cv2.boxFilter(a, cv2.CV_32F, (r, r))
+    mean_b = cv2.boxFilter(b, cv2.CV_32F, (r, r))
     # 5
     q = mean_a * i + mean_b
 
