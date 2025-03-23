@@ -1,4 +1,5 @@
 import dark_channel_prior
+import fast_visibility_restoration
 
 
 def main():

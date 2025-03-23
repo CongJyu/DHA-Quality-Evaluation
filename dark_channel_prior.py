@@ -17,7 +17,7 @@ def get_dark_channel(img, size=20):
 
 # 去雾模型 I(x) = J(x)t(x) + A[1 - t(x)]
 # 常量参数 w (0 < w < 1) 控制去雾的程度
-# 透射率 t(x) = 1 - w * min(min(I_c(y) / A_c)
+# 透射率 t(x) = 1 - w * min(I_c(y) / A_c)
 # J(x) = (I(x) - A) / (max(t(x), t_0)) + A
 
 
