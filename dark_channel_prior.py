@@ -3,9 +3,7 @@
 
 import cv2
 import numpy as np
-
-input_path = "./hazed-image/haze-4.jpg"
-output_path = "./dehazed-image/dehaze-4.jpg"
+import os
 
 
 # 根据 Kaiming He 的论文描述求取图像的暗通道
@@ -84,14 +82,25 @@ def dehaze(img_input, img_output):
     cv2.imwrite(img_output, result * 255)
 
 
-dehaze(input_path, output_path)
+# 数据集测试
+input_path = "./hazed-image"
+output_path = "./dehazed-image"
+input_path_list = os.listdir(input_path)
+input_path_list.remove('.DS_Store')
+output_path_list = os.listdir(output_path)
+output_path_list.remove('.DS_Store')
+
+for file_name in input_path_list:
+    input_hazed_image = os.path.join(input_path, file_name)
+    output_dehazed_image = os.path.join(output_path, file_name)
+    dehaze(input_hazed_image, output_dehazed_image)
 
 
 # opencv 读取图像的颜色通道顺序是 [B, G, R]
 # 测试图像读取并对比显示
-hazed_image = cv2.imread(input_path)
-dehazed_image = cv2.imread(output_path)
-cv2.imshow("dark channel prior dehazing - original", hazed_image)
-cv2.imshow("dark channel prior dehazing - processed", dehazed_image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# hazed_image = cv2.imread(input_path)
+# dehazed_image = cv2.imread(output_path)
+# cv2.imshow("dark channel prior dehazing - original", hazed_image)
+# cv2.imshow("dark channel prior dehazing - processed", dehazed_image)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
