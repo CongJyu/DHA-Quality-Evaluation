@@ -83,7 +83,7 @@ def dehaze(img_input, img_output):
 
 
 # 数据集测试
-def dark_channel_prior_test():
+def test():
     input_path = "./hazed-image"
     output_path = "./dehazed-image"
     input_path_list = os.listdir(input_path)
