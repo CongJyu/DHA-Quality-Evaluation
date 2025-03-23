@@ -93,6 +93,7 @@ output_path_list.remove('.DS_Store')
 for file_name in input_path_list:
     input_hazed_image = os.path.join(input_path, file_name)
     output_dehazed_image = os.path.join(output_path, file_name)
+    print("[ INFO ] Processing image: ", file_name)
     dehaze(input_hazed_image, output_dehazed_image)
 
 
