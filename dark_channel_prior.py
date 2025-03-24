@@ -83,19 +83,20 @@ def dehaze(img_input, img_output):
 
 
 # 数据集测试
-def test():
-    input_path = "./hazed-image"
-    output_path = "./dehazed-image"
+def test(input_path, output_path):
     input_path_list = os.listdir(input_path)
-    input_path_list.remove('.DS_Store')
+    if ".DS_Store" in input_path_list:
+        input_path_list.remove(".DS_Store")
     output_path_list = os.listdir(output_path)
-    output_path_list.remove('.DS_Store')
+    if ".DS_Store" in output_path_list:
+        output_path_list.remove(".DS_Store")
 
     for file_name in input_path_list:
         input_hazed_image = os.path.join(input_path, file_name)
         output_dehazed_image = os.path.join(output_path, file_name)
         print("[ INFO ] Processing image: ", file_name)
         dehaze(input_hazed_image, output_dehazed_image)
+
 
 # 测试图像读取并对比显示
 # hazed_image = cv2.imread(input_path)

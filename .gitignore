@@ -15,3 +15,5 @@ wheels/
 # Datasets
 hazed-image/
 dehazed-image/
+dehazed-image-dark-channel-prior/
+dehazed-image-fast-vis-restoration/
