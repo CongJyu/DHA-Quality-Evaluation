@@ -1,6 +1,7 @@
 import dark_channel_prior
 import fast_visibility_restoration
 
+
 input_path = "./hazed-image"
 output_path_1 = "./dehazed-image-dark-channel-prior"
 output_path_2 = "./dehazed-image-fast-vis-restoration"
@@ -8,9 +9,13 @@ output_path_2 = "./dehazed-image-fast-vis-restoration"
 
 def main():
     print("\n[ TEST ] Dark Channel Prior Dehazing\n")
-    dark_channel_prior.test(input_path, output_path_1)
+    dark_channel_prior.dehaze_test(input_path, output_path_1)
+    print("\n[ TEST ] Dark Channel Prior Evaluating\n")
+    dark_channel_prior.dehaze_evaluate(input_path, output_path_2)
     print("\n[ TEST ] Fast Visibility Restoration Dehazing\n")
-    fast_visibility_restoration.test(input_path, output_path_2)
+    fast_visibility_restoration.dehaze_test(input_path, output_path_2)
+    print("\n[ TEST ] Fast Visibility Restoration Evaluating\n")
+    fast_visibility_restoration.dehaze_evaluate(input_path, output_path_2)
 
 
 if __name__ == "__main__":
