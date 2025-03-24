@@ -16,16 +16,16 @@ output_path_3 = "./dehazed-image-equalized-hist"
 
 
 def main():
-    # # Kaiming He 暗通道去雾方法测试
-    # print("\n[ TEST ] Dark Channel Prior Dehazing\n")
-    # dark_channel_prior.dehaze_test(input_path, output_path_1)
-    # print("\n[ TEST ] Dark Channel Prior Evaluating\n")
-    # dark_channel_prior.dehaze_evaluate(input_path, output_path_1)
-    # # Tarel 快速恢复可见性方法测试
-    # print("\n[ TEST ] Fast Visibility Restoration Dehazing\n")
-    # fast_visibility_restoration.dehaze_test(input_path, output_path_2)
-    # print("\n[ TEST ] Fast Visibility Restoration Evaluating\n")
-    # fast_visibility_restoration.dehaze_evaluate(input_path, output_path_2)
+    # Kaiming He 暗通道去雾方法测试
+    print("\n[ TEST ] Dark Channel Prior Dehazing\n")
+    dark_channel_prior.dehaze_test(input_path, output_path_1)
+    print("\n[ TEST ] Dark Channel Prior Evaluating\n")
+    dark_channel_prior.dehaze_evaluate(input_path, output_path_1)
+    # Tarel 快速恢复可见性方法测试
+    print("\n[ TEST ] Fast Visibility Restoration Dehazing\n")
+    fast_visibility_restoration.dehaze_test(input_path, output_path_2)
+    print("\n[ TEST ] Fast Visibility Restoration Evaluating\n")
+    fast_visibility_restoration.dehaze_evaluate(input_path, output_path_2)
     # 图像增强方式的灰度直方图均衡方法测试
     print("\n[ TEST ] Equalize Histogram Dehazing\n")
     equalized_hist.dehaze_test(input_path, output_path_3)
