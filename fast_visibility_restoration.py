@@ -131,7 +131,8 @@ def dehaze_evaluate(input_path, output_path):
 
     print("Image    \tPSNR     \tSSIM\n---------\t---------\t---------")
     for file_name in input_path_list:
-        original_image_path = os.path.join(input_path, file_name)
+        # original_image_path = os.path.join(input_path, file_name)
+        original_image_path = os.path.join("./clear-image", file_name)
         dehazed_image_path = os.path.join(output_path, file_name)
         original_image = cv2.imread(original_image_path)
         original_image = original_image.astype("float32") / 255
