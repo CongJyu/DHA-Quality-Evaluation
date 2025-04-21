@@ -15,6 +15,9 @@ from PIL import Image
 import glob
 
 
+apple_silicon = torch.device("mps")
+
+
 def dehaze_image(image_path):
 
     data_hazy = Image.open(image_path)
@@ -22,9 +25,11 @@ def dehaze_image(image_path):
 
     data_hazy = torch.from_numpy(data_hazy).float()
     data_hazy = data_hazy.permute(2, 0, 1)
-    data_hazy = data_hazy.cpu().unsqueeze(0)
+    # data_hazy = data_hazy.cpu().unsqueeze(0)
+    data_hazy = data_hazy.to(apple_silicon).unsqueeze(0)
 
-    dehaze_net = AOD_net.dehaze_net().cpu()
+    # dehaze_net = AOD_net.dehaze_net().cpu()
+    dehaze_net = AOD_net.dehaze_net().to(apple_silicon)
     dehaze_net.load_state_dict(torch.load('AOD-net-snapshots/Epoch9.pth'))
 
     clean_image = dehaze_net(data_hazy)

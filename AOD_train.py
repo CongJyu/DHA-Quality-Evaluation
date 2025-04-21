@@ -13,6 +13,9 @@ import numpy as np
 from torchvision import transforms
 
 
+apple_silicon = torch.device("mps")
+
+
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
@@ -24,7 +27,8 @@ def weights_init(m):
 
 def train(config):
 
-    dehaze_net = AOD_net.dehaze_net().cpu()
+    # dehaze_net = AOD_net.dehaze_net().cpu()
+    dehaze_net = AOD_net.dehaze_net().to(apple_silicon)
     dehaze_net.apply(weights_init)
 
     train_dataset = AOD_dataloader.dehazing_loader(
@@ -42,7 +46,8 @@ def train(config):
         shuffle=True, num_workers=config.num_workers, pin_memory=True
     )
 
-    criterion = nn.MSELoss().cpu()
+    # criterion = nn.MSELoss().cpu()
+    criterion = nn.MSELoss().to(apple_silicon)
     optimizer = torch.optim.Adam(
         dehaze_net.parameters(), lr=config.lr, weight_decay=config.weight_decay
     )
@@ -52,8 +57,10 @@ def train(config):
     for epoch in range(config.num_epochs):
         for iteration, (img_orig, img_haze) in enumerate(train_loader):
 
-            img_orig = img_orig.cpu()
-            img_haze = img_haze.cpu()
+            # img_orig = img_orig.cpu()
+            # img_haze = img_haze.cpu()
+            img_orig = img_orig.to(apple_silicon)
+            img_haze = img_haze.to(apple_silicon)
 
             clean_image = dehaze_net(img_haze)
 
@@ -70,15 +77,18 @@ def train(config):
             if ((iteration+1) % config.display_iter) == 0:
                 print("Loss at iteration", iteration+1, ":", loss.item())
             if ((iteration+1) % config.snapshot_iter) == 0:
-
-                torch.save(dehaze_net.state_dict(
-                ), config.snapshots_folder + "Epoch" + str(epoch) + '.pth')
+                torch.save(
+                    dehaze_net.state_dict(),
+                    config.snapshots_folder + "Epoch" + str(epoch) + '.pth'
+                )
 
         # Validation Stage
         for iter_val, (img_orig, img_haze) in enumerate(val_loader):
 
-            img_orig = img_orig.cpu()
-            img_haze = img_haze.cpu()
+            # img_orig = img_orig.cpu()
+            # img_haze = img_haze.cpu()
+            img_orig = img_orig.to(apple_silicon)
+            img_haze = img_haze.to(apple_silicon)
 
             clean_image = dehaze_net(img_haze)
 
@@ -87,8 +97,10 @@ def train(config):
                 config.sample_output_folder+str(iter_val+1)+".jpg"
             )
 
-        torch.save(dehaze_net.state_dict(),
-                   config.snapshots_folder + "dehazer.pth")
+        torch.save(
+            dehaze_net.state_dict(),
+            config.snapshots_folder + "dehazer.pth"
+        )
 
 
 if __name__ == "__main__":
