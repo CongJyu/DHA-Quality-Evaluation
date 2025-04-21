@@ -52,7 +52,7 @@ def train(config):
     )
     dehaze_net.train()
     for epoch in range(config.num_epochs):
-        print("[ INFO ] EPOCH #", epoch, "\n")
+        print("\n[ INFO ] EPOCH #", epoch)
         for iteration, (img_orig, img_haze) in enumerate(train_loader):
             # img_orig = img_orig.cpu()
             # img_haze = img_haze.cpu()
