@@ -52,7 +52,7 @@ def train(config):
     )
     dehaze_net.train()
     for epoch in range(config.num_epochs):
-        print("\n[ INFO ] EPOCH #", epoch)
+        print(f"\n[ INFO ] EPOCH #{epoch}")
         for iteration, (img_orig, img_haze) in enumerate(train_loader):
             # img_orig = img_orig.cpu()
             # img_haze = img_haze.cpu()
@@ -69,7 +69,7 @@ def train(config):
             optimizer.step()
             if ((iteration+1) % config.display_iter) == 0:
                 print(
-                    "[ INFO ] Current epoch:", epoch,
+                    f"[ INFO ] Current epoch: {epoch}",
                     ", Loss at iteration", iteration + 1, ":", loss.item()
                 )
             if ((iteration+1) % config.snapshot_iter) == 0:
