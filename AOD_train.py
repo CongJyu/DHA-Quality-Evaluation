@@ -80,8 +80,10 @@ def train(config):
 
             clean_image = dehaze_net(img_haze)
 
-            torchvision.utils.save_image(torch.cat(
-                (img_haze, clean_image, img_orig), 0), config.sample_output_folder+str(iter_val+1)+".jpg")
+            torchvision.utils.save_image(
+                torch.cat((img_haze, clean_image, img_orig), 0),
+                config.sample_output_folder+str(iter_val+1)+".jpg"
+            )
 
         torch.save(dehaze_net.state_dict(),
                    config.snapshots_folder + "dehazer.pth")
@@ -92,10 +94,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # Input Parameters
-    parser.add_argument('--orig_images_path', type=str,
-                        default="training-image-AOD-net/images/")
-    parser.add_argument('--hazy_images_path', type=str,
-                        default="training-image-AOD-net/data/")
+    parser.add_argument(
+        '--orig_images_path', type=str,
+        default="training-image-AOD-net/images/"
+    )
+    parser.add_argument(
+        '--hazy_images_path', type=str,
+        default="training-image-AOD-net/data/"
+    )
     parser.add_argument('--lr', type=float, default=0.0001)
     parser.add_argument('--weight_decay', type=float, default=0.0001)
     parser.add_argument('--grad_clip_norm', type=float, default=0.1)
@@ -105,8 +111,10 @@ if __name__ == "__main__":
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--display_iter', type=int, default=10)
     parser.add_argument('--snapshot_iter', type=int, default=200)
-    parser.add_argument('--snapshots_folder', type=str,
-                        default="AOD-net-snapshots/")
+    parser.add_argument(
+        '--snapshots_folder', type=str,
+        default="AOD-net-snapshots/"
+    )
     parser.add_argument('--sample_output_folder', type=str, default="samples/")
 
     config = parser.parse_args()
