@@ -19,7 +19,6 @@ import random
 # AOD_dataloader
 random.seed(202108030122)
 # 设置训练 AOD-Net 使用的设备
-training_device = torch.device("cpu")
 if torch.mps.is_available():
     training_device = torch.device("mps")
 elif torch.cuda.is_available():
@@ -201,6 +200,13 @@ def train(config):
 
 
 if __name__ == "__main__":
+    # 设备提示
+    if torch.mps.is_available():
+        print("[ INFO ] Start process with MPS.\n")
+    elif torch.cuda.is_available():
+        print("[ INFO ] Start process with CUDA\n")
+    else:
+        print("[ INFO ] Start process with CPU\n")
     # 训练计时开始
     start_time = time.time()
     parser = argparse.ArgumentParser()

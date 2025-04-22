@@ -13,7 +13,6 @@ import glob
 
 
 # 设置训练 AOD-Net 使用的设备
-training_device = torch.device("cpu")
 if torch.mps.is_available():
     training_device = torch.device("mps")
 elif torch.cuda.is_available():
@@ -67,6 +66,13 @@ def dehaze_image(image_path):
 
 
 if __name__ == '__main__':
+    # 设备提示
+    if torch.mps.is_available():
+        print("[ INFO ] Start process with MPS.\n")
+    elif torch.cuda.is_available():
+        print("[ INFO ] Start process with CUDA\n")
+    else:
+        print("[ INFO ] Start process with CPU\n")
     test_list = glob.glob("hazed-image/*")
     for image in test_list:
         print("[ INFO ] Processing image: ", image)
