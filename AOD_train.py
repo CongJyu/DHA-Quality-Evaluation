@@ -18,7 +18,7 @@ from PIL import Image
 import glob
 import random
 
-random.seed(1143)
+random.seed(202108030122)
 
 
 def populate_train_list(orig_images_path, hazy_images_path):
