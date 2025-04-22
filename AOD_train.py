@@ -22,13 +22,10 @@ random.seed(202108030122)
 training_device = torch.device("cpu")
 if torch.mps.is_available():
     training_device = torch.device("mps")
-    print("[ INFO ] Start processing with MPS\n")
 elif torch.cuda.is_available():
     training_device = torch.device("cuda")
-    print("[ INFO ] Start processing with CUDA\n")
 else:
     training_device = torch.device("cpu")
-    print("[ INFO ] Start processing with CPU˝\n")
 
 
 def populate_train_list(orig_images_path, hazy_images_path):

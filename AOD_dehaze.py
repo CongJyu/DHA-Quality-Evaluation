@@ -16,13 +16,10 @@ import glob
 training_device = torch.device("cpu")
 if torch.mps.is_available():
     training_device = torch.device("mps")
-    print("[ INFO ] Start processing with MPS\n")
 elif torch.cuda.is_available():
     training_device = torch.device("cuda")
-    print("[ INFO ] Start processing with CUDA\n")
 else:
     training_device = torch.device("cpu")
-    print("[ INFO ] Start processing with CPU˝\n")
 
 
 # AOD_net
