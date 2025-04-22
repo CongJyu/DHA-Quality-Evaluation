@@ -1,16 +1,118 @@
+# AOD-Net 端到端去雾网络 复现
+# 湖南大学 信息科学与工程学院 通信工程 陈昶宇
+
+# 参考 https://github.com/MayankSingal/PyTorch-Image-Dehazing 代码进行修改
+
+# AOD-Net 训练程序
+
 import torch
-import torch.nn as nn
 import torchvision
-import torch.backends.cudnn as cudnn
-import torch.optim
 import os
-# import sys
 import argparse
 import time
-import AOD_dataloader
-import AOD_net
 import numpy as np
-from torchvision import transforms
+
+
+# AOD_dataloader
+from PIL import Image
+import glob
+import random
+
+random.seed(1143)
+
+
+def populate_train_list(orig_images_path, hazy_images_path):
+    train_list = []
+    val_list = []
+    image_list_haze = glob.glob(hazy_images_path + "*.jpg")
+    tmp_dict = {}
+    for image in image_list_haze:
+        image = image.split("/")[-1]
+        # image = image.split("/")[-1][5:]  # changed
+        key = image.split("_")[0] + "_" + image.split("_")[1] + ".jpg"
+        if key in tmp_dict.keys():
+            tmp_dict[key].append(image)
+        else:
+            tmp_dict[key] = []
+            tmp_dict[key].append(image)
+    train_keys = []
+    val_keys = []
+    len_keys = len(tmp_dict.keys())
+    for i in range(len_keys):
+        if i < len_keys * 9 / 10:
+            train_keys.append(list(tmp_dict.keys())[i])
+        else:
+            val_keys.append(list(tmp_dict.keys())[i])
+    for key in list(tmp_dict.keys()):
+        if key in train_keys:
+            for hazy_image in tmp_dict[key]:
+                train_list.append(
+                    [orig_images_path + key, hazy_images_path + hazy_image]
+                )
+        else:
+            for hazy_image in tmp_dict[key]:
+                val_list.append(
+                    [orig_images_path + key, hazy_images_path + hazy_image]
+                )
+    random.shuffle(train_list)
+    random.shuffle(val_list)
+    return train_list, val_list
+
+
+class dehazing_loader(torch.utils.data.Dataset):
+    def __init__(self, orig_images_path, hazy_images_path, mode='train'):
+        self.train_list, self.val_list = populate_train_list(
+            orig_images_path, hazy_images_path
+        )
+        if mode == 'train':
+            self.data_list = self.train_list
+            print("Total training examples:", len(self.train_list))
+        else:
+            self.data_list = self.val_list
+            print("Total validation examples:", len(self.val_list))
+
+    def __getitem__(self, index):
+        data_orig_path, data_hazy_path = self.data_list[index]
+        data_orig = Image.open(data_orig_path)
+        data_hazy = Image.open(data_hazy_path)
+        # data_orig = data_orig.resize((480, 640), Image.ANTIALIAS)
+        # data_hazy = data_hazy.resize((480, 640), Image.ANTIALIAS)
+        data_orig = data_orig.resize((480, 640), Image.Resampling.LANCZOS)
+        data_hazy = data_hazy.resize((480, 640), Image.Resampling.LANCZOS)
+        data_orig = (np.asarray(data_orig)/255.0)
+        data_hazy = (np.asarray(data_hazy)/255.0)
+        data_orig = torch.from_numpy(data_orig).float()
+        data_hazy = torch.from_numpy(data_hazy).float()
+        return data_orig.permute(2, 0, 1), data_hazy.permute(2, 0, 1)
+
+    def __len__(self):
+        return len(self.data_list)
+
+
+# AOD_net
+class dehaze_net(torch.nn.Module):
+    def __init__(self):
+        super(dehaze_net, self).__init__()
+        self.relu = torch.nn.ReLU(inplace=True)
+        self.e_conv1 = torch.nn.Conv2d(3, 3, 1, 1, 0, bias=True)
+        self.e_conv2 = torch.nn.Conv2d(3, 3, 3, 1, 1, bias=True)
+        self.e_conv3 = torch.nn.Conv2d(6, 3, 5, 1, 2, bias=True)
+        self.e_conv4 = torch.nn.Conv2d(6, 3, 7, 1, 3, bias=True)
+        self.e_conv5 = torch.nn.Conv2d(12, 3, 3, 1, 1, bias=True)
+
+    def forward(self, x):
+        source = []
+        source.append(x)
+        x1 = self.relu(self.e_conv1(x))
+        x2 = self.relu(self.e_conv2(x1))
+        concat1 = torch.cat((x1, x2), 1)
+        x3 = self.relu(self.e_conv3(concat1))
+        concat2 = torch.cat((x2, x3), 1)
+        x4 = self.relu(self.e_conv4(concat2))
+        concat3 = torch.cat((x1, x2, x3, x4), 1)
+        x5 = self.relu(self.e_conv5(concat3))
+        clean_image = self.relu((x5 * x) - x5 + 1)
+        return clean_image
 
 
 apple_silicon = torch.device("mps")
@@ -19,32 +121,32 @@ apple_silicon = torch.device("mps")
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
-        m.weight.data.normal_(0.0, 0.02)
+        m.weight.torch.utils.data.normal_(0.0, 0.02)
     elif classname.find('BatchNorm') != -1:
-        m.weight.data.normal_(1.0, 0.02)
-        m.bias.data.fill_(0)
+        m.weight.torch.utils.data.normal_(1.0, 0.02)
+        m.bias.torch.utils.data.fill_(0)
 
 
 def train(config):
     # dehaze_net = AOD_net.dehaze_net().cpu()
-    dehaze_net = AOD_net.dehaze_net().to(apple_silicon)
+    dehaze_net = dehaze_net().to(apple_silicon)
     dehaze_net.apply(weights_init)
-    train_dataset = AOD_dataloader.dehazing_loader(
+    train_dataset = dehazing_loader(
         config.orig_images_path, config.hazy_images_path
     )
-    val_dataset = AOD_dataloader.dehazing_loader(
+    val_dataset = dehazing_loader(
         config.orig_images_path, config.hazy_images_path, mode="val"
     )
-    train_loader = torch.utils.data.DataLoader(
+    train_loader = torch.utils.torch.utils.data.DataLoader(
         train_dataset, batch_size=config.train_batch_size,
         shuffle=True, num_workers=config.num_workers, pin_memory=True
     )
-    val_loader = torch.utils.data.DataLoader(
+    val_loader = torch.utils.torch.utils.data.DataLoader(
         val_dataset, batch_size=config.val_batch_size,
         shuffle=True, num_workers=config.num_workers, pin_memory=True
     )
-    # criterion = nn.MSELoss().cpu()
-    criterion = nn.MSELoss().to(apple_silicon)
+    # criterion = torch.nn.MSELoss().cpu()
+    criterion = torch.nn.MSELoss().to(apple_silicon)
     optimizer = torch.optim.Adam(
         dehaze_net.parameters(),
         lr=config.lr,
@@ -62,7 +164,7 @@ def train(config):
             loss = criterion(clean_image, img_orig)
             optimizer.zero_grad()
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(
+            torch.torch.nn.utils.clip_grad_norm_(
                 dehaze_net.parameters(),
                 config.grad_clip_norm
             )
