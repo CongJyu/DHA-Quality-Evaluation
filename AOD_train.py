@@ -11,14 +11,14 @@ import os
 import argparse
 import time
 import numpy as np
-
-
-# AOD_dataloader
 from PIL import Image
 import glob
 import random
 
+
+# AOD_dataloader
 random.seed(202108030122)
+apple_silicon = torch.device("mps")
 
 
 def populate_train_list(orig_images_path, hazy_images_path):
@@ -90,9 +90,9 @@ class dehazing_loader(torch.utils.data.Dataset):
 
 
 # AOD_net
-class dehaze_net(torch.nn.Module):
+class aod_dehaze_net(torch.nn.Module):
     def __init__(self):
-        super(dehaze_net, self).__init__()
+        super(aod_dehaze_net, self).__init__()
         self.relu = torch.nn.ReLU(inplace=True)
         self.e_conv1 = torch.nn.Conv2d(3, 3, 1, 1, 0, bias=True)
         self.e_conv2 = torch.nn.Conv2d(3, 3, 3, 1, 1, bias=True)
@@ -115,21 +115,18 @@ class dehaze_net(torch.nn.Module):
         return clean_image
 
 
-apple_silicon = torch.device("mps")
-
-
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
-        m.weight.torch.utils.data.normal_(0.0, 0.02)
+        m.weight.data.normal_(0.0, 0.02)
     elif classname.find('BatchNorm') != -1:
-        m.weight.torch.utils.data.normal_(1.0, 0.02)
-        m.bias.torch.utils.data.fill_(0)
+        m.weight.data.normal_(1.0, 0.02)
+        m.bias.data.fill_(0)
 
 
 def train(config):
     # dehaze_net = AOD_net.dehaze_net().cpu()
-    dehaze_net = dehaze_net().to(apple_silicon)
+    dehaze_net = aod_dehaze_net().to(apple_silicon)
     dehaze_net.apply(weights_init)
     train_dataset = dehazing_loader(
         config.orig_images_path, config.hazy_images_path
@@ -137,11 +134,11 @@ def train(config):
     val_dataset = dehazing_loader(
         config.orig_images_path, config.hazy_images_path, mode="val"
     )
-    train_loader = torch.utils.torch.utils.data.DataLoader(
+    train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=config.train_batch_size,
         shuffle=True, num_workers=config.num_workers, pin_memory=True
     )
-    val_loader = torch.utils.torch.utils.data.DataLoader(
+    val_loader = torch.utils.data.DataLoader(
         val_dataset, batch_size=config.val_batch_size,
         shuffle=True, num_workers=config.num_workers, pin_memory=True
     )
@@ -164,7 +161,7 @@ def train(config):
             loss = criterion(clean_image, img_orig)
             optimizer.zero_grad()
             loss.backward()
-            torch.torch.nn.utils.clip_grad_norm_(
+            torch.nn.utils.clip_grad_norm_(
                 dehaze_net.parameters(),
                 config.grad_clip_norm
             )
