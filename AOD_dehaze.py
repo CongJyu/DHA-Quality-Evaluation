@@ -12,7 +12,17 @@ from PIL import Image
 import glob
 
 
-apple_silicon = torch.device("mps")
+# 设置训练 AOD-Net 使用的设备
+training_device = torch.device("cpu")
+if torch.mps.is_available():
+    training_device = torch.device("mps")
+    print("[ INFO ] Start processing with MPS\n")
+elif torch.cuda.is_available():
+    training_device = torch.device("cuda")
+    print("[ INFO ] Start processing with CUDA\n")
+else:
+    training_device = torch.device("cpu")
+    print("[ INFO ] Start processing with CPU˝\n")
 
 
 # AOD_net
@@ -47,9 +57,9 @@ def dehaze_image(image_path):
     data_hazy = torch.from_numpy(data_hazy).float()
     data_hazy = data_hazy.permute(2, 0, 1)
     # data_hazy = data_hazy.cpu().unsqueeze(0)
-    data_hazy = data_hazy.to(apple_silicon).unsqueeze(0)
+    data_hazy = data_hazy.to(training_device).unsqueeze(0)
     # dehaze_net = AOD_net.dehaze_net().cpu()
-    dehaze_net = aod_dehaze_net().to(apple_silicon)
+    dehaze_net = aod_dehaze_net().to(training_device)
     dehaze_net.load_state_dict(torch.load('AOD-net-snapshots/dehazer.pth'))
     clean_image = dehaze_net(data_hazy)
     # torchvision.utils.save_image(torch.cat(

@@ -18,7 +18,17 @@ import random
 
 # AOD_dataloader
 random.seed(202108030122)
-apple_silicon = torch.device("mps")
+# 设置训练 AOD-Net 使用的设备
+training_device = torch.device("cpu")
+if torch.mps.is_available():
+    training_device = torch.device("mps")
+    print("[ INFO ] Start processing with MPS\n")
+elif torch.cuda.is_available():
+    training_device = torch.device("cuda")
+    print("[ INFO ] Start processing with CUDA\n")
+else:
+    training_device = torch.device("cpu")
+    print("[ INFO ] Start processing with CPU˝\n")
 
 
 def populate_train_list(orig_images_path, hazy_images_path):
@@ -126,7 +136,7 @@ def weights_init(m):
 
 def train(config):
     # dehaze_net = AOD_net.dehaze_net().cpu()
-    dehaze_net = aod_dehaze_net().to(apple_silicon)
+    dehaze_net = aod_dehaze_net().to(training_device)
     dehaze_net.apply(weights_init)
     train_dataset = dehazing_loader(
         config.orig_images_path, config.hazy_images_path
@@ -143,7 +153,7 @@ def train(config):
         shuffle=True, num_workers=config.num_workers, pin_memory=True
     )
     # criterion = torch.nn.MSELoss().cpu()
-    criterion = torch.nn.MSELoss().to(apple_silicon)
+    criterion = torch.nn.MSELoss().to(training_device)
     optimizer = torch.optim.Adam(
         dehaze_net.parameters(),
         lr=config.lr,
@@ -155,8 +165,8 @@ def train(config):
         for iteration, (img_orig, img_haze) in enumerate(train_loader):
             # img_orig = img_orig.cpu()
             # img_haze = img_haze.cpu()
-            img_orig = img_orig.to(apple_silicon)
-            img_haze = img_haze.to(apple_silicon)
+            img_orig = img_orig.to(training_device)
+            img_haze = img_haze.to(training_device)
             clean_image = dehaze_net(img_haze)
             loss = criterion(clean_image, img_orig)
             optimizer.zero_grad()
@@ -180,8 +190,8 @@ def train(config):
         for iter_val, (img_orig, img_haze) in enumerate(val_loader):
             # img_orig = img_orig.cpu()
             # img_haze = img_haze.cpu()
-            img_orig = img_orig.to(apple_silicon)
-            img_haze = img_haze.to(apple_silicon)
+            img_orig = img_orig.to(training_device)
+            img_haze = img_haze.to(training_device)
             clean_image = dehaze_net(img_haze)
             torchvision.utils.save_image(
                 torch.cat((img_haze, clean_image, img_orig), 0),
