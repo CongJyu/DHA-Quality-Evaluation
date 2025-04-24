@@ -139,7 +139,8 @@ def dehaze_evaluate(input_path, output_path):
         dehazed_image = cv2.imread(dehazed_image_path)
         dehazed_image = dehazed_image.astype("float32") / 255
         current_psnr = round(evaluation.compare_psnr(
-            original_image, dehazed_image), 6)
+            original_image, dehazed_image), 6
+        )
         current_ssim = round(evaluation.compare_ssim(
             original_image, dehazed_image, win_size=7, data_range=255, channel_axis=2), 6)
         print(file_name, "\t", current_psnr, "\t", current_ssim)
