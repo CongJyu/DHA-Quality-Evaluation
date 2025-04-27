@@ -10,6 +10,7 @@ dependencies = [
     "numpy==2.2.5",
     "opencv-python==4.11.0.86",
     "pillow==11.2.1",
+    "prefetch-generator==1.0.3",
     "scikit-image==0.25.2",
     "scipy==1.15.2",
     "tensorboardx==2.6.2.2",

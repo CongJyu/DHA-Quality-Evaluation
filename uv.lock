@@ -96,6 +96,7 @@ dependencies = [
     { name = "numpy" },
     { name = "opencv-python" },
     { name = "pillow" },
+    { name = "prefetch-generator" },
     { name = "scikit-image" },
     { name = "scipy" },
     { name = "tensorboardx" },
@@ -110,6 +111,7 @@ requires-dist = [
     { name = "numpy", specifier = "==2.2.5" },
     { name = "opencv-python", specifier = "==4.11.0.86" },
     { name = "pillow", specifier = "==11.2.1" },
+    { name = "prefetch-generator", specifier = "==1.0.3" },
     { name = "scikit-image", specifier = "==0.25.2" },
     { name = "scipy", specifier = "==1.15.2" },
     { name = "tensorboardx", specifier = "==2.6.2.2" },
@@ -710,6 +712,12 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/58/0e/2abab98a72202d91146abc839e10c14f7cf36166f12838ea0c4db3ca6ecb/pillow-11.2.1-pp311-pypy311_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:14f73f7c291279bd65fda51ee87affd7c1e097709f7fdd0188957a16c264601f", size = 3571586, upload_time = "2025-04-12T17:49:57.171Z" },
     { url = "https://files.pythonhosted.org/packages/21/2c/5e05f58658cf49b6667762cca03d6e7d85cededde2caf2ab37b81f80e574/pillow-11.2.1-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:208653868d5c9ecc2b327f9b9ef34e0e42a4cdd172c2988fd81d62d2bc9bc044", size = 2674751, upload_time = "2025-04-12T17:49:59.628Z" },
 ]
+
+[[package]]
+name = "prefetch-generator"
+version = "1.0.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/28/cf/f6c148289fd87832e9f20428b7e842921efac5313cb3ac5920a424543760/prefetch_generator-1.0.3.tar.gz", hash = "sha256:cefabd51c7ff3cdc1c885e22d287592219fe1ca25623322806370a0ce9acd32b", size = 4592, upload_time = "2022-11-19T14:38:34.21Z" }
 
 [[package]]
 name = "protobuf"
