@@ -29,6 +29,7 @@ def get_dark_channel(img, size=20):
 def get_atmos_light(img, percent=0.001):
     mean_per_pixel = np.mean(img, axis=2).reshape(-1)  # 计算图像每个像素的平均值，拉平成一维数组
     # 选取最亮 percent 部分的像素
+    mean_per_pixel = np.sort(mean_per_pixel)[::-1]
     mean_top = mean_per_pixel[:int(img.shape[0] * img.shape[1] * percent)]
     return np.mean(mean_top)
 
