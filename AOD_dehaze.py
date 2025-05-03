@@ -111,3 +111,8 @@ if __name__ == "__main__":
         dehaze_image(image)
         # print(image, "done!")
     print("[ INFO ] Success. All images done.")
+
+    dehaze_evaluate(
+        input_path="./hazed-image",
+        output_path="./dehazed-image/AOD-net"
+    )

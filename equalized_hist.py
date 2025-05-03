@@ -71,11 +71,11 @@ def dehaze_evaluate(input_path, output_path):
 if __name__ == "__main__":
     dehaze_test(
         input_path="./hazed-image",
-        output_path="./dehazed-image/AOD-net"
+        output_path="./dehazed-image/equalized-hist"
     )
     dehaze_evaluate(
         input_path="./hazed-image",
-        output_path="./dehazed-image/AOD-net"
+        output_path="./dehazed-image/equalized-hist"
     )
 
 # 读取输入图像
