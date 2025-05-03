@@ -15,15 +15,7 @@ wheels/
 # Datasets
 hazed-image/
 dehazed-image/
-dehazed-image-dark-channel-prior/
-dehazed-image-fast-vis-restoration/
-dehazed-image-equalized-hist/
-dehazed-image-AOD-net/
 clear-image/
-training-image-AOD-net/
-AOD-net-snapshots/
 samples/
-DehIQA-data/
-RW_HAZE/
+training-image-AOD-net/
 rw_haze_test/
-

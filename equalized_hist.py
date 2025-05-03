@@ -70,6 +70,16 @@ def dehaze_evaluate(input_path, output_path):
         print(file_name, "\t", current_psnr, "\t", current_ssim)
 
 
+if __name__ == "__main__":
+    dehaze_test(
+        input_path="./hazed-image",
+        output_path="./dehazed-image/AOD-net"
+    )
+    dehaze_evaluate(
+        input_path="./hazed-image",
+        output_path="./dehazed-image/AOD-net"
+    )
+
 # 读取输入图像
 # input_image = cv2.imread("./hazed-image/haze-3.jpg")
 
