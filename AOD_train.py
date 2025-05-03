@@ -28,22 +28,33 @@ else:
 
 
 def populate_train_list(orig_images_path, hazy_images_path):
+    # 初始化两个列表
     train_list = []
     val_list = []
+    # 获取所有的含雾图像
+    # 使用 glob 获取指定目录下的 jpg 格式的文件
     image_list_haze = glob.glob(hazy_images_path + "*.jpg")
+    # 构建映射关系
     tmp_dict = {}
+    # 提取关键字 key
     for image in image_list_haze:
         image = image.split("/")[-1]
         # image = image.split("/")[-1][5:]  # changed
         key = image.split("_")[0] + "_" + image.split("_")[1] + ".jpg"
+        # 储存含雾图像的映射
+        # key 为原始的清晰图像的名称
         if key in tmp_dict.keys():
             tmp_dict[key].append(image)
         else:
             tmp_dict[key] = []
             tmp_dict[key].append(image)
+    # 划分训练集和验证集
+    # 其中训练集存放于 train_keys 列表中
+    # 验证集存放于 val_keys 列表中
     train_keys = []
     val_keys = []
     len_keys = len(tmp_dict.keys())
+    # 90% 的数据用于训练，10% 的数据用于验证
     for i in range(len_keys):
         if i < len_keys * 9 / 10:
             train_keys.append(list(tmp_dict.keys())[i])
@@ -52,25 +63,29 @@ def populate_train_list(orig_images_path, hazy_images_path):
     for key in list(tmp_dict.keys()):
         if key in train_keys:
             for hazy_image in tmp_dict[key]:
+                # train_list 是清晰图像路径和对应的含雾图像的路径
                 train_list.append(
                     [orig_images_path + key, hazy_images_path + hazy_image]
                 )
         else:
             for hazy_image in tmp_dict[key]:
+                # val_list 是清晰图像和对应的含雾图像的路径
                 val_list.append(
                     [orig_images_path + key, hazy_images_path + hazy_image]
                 )
+    # 随机打乱训练集和验证集
     random.shuffle(train_list)
     random.shuffle(val_list)
+    # 返回最终数据集列表
     return train_list, val_list
 
 
 class dehazing_loader(torch.utils.data.Dataset):
-    def __init__(self, orig_images_path, hazy_images_path, mode='train'):
+    def __init__(self, orig_images_path, hazy_images_path, mode="train"):
         self.train_list, self.val_list = populate_train_list(
             orig_images_path, hazy_images_path
         )
-        if mode == 'train':
+        if mode == "train":
             self.data_list = self.train_list
             print("Total training examples:", len(self.train_list))
         else:
