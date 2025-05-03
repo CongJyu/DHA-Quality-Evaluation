@@ -1,11 +1,9 @@
 # 暗通道先验去雾 复现
 # 湖南大学 信息科学与工程学院 通信工程 陈昶宇
 
-# 计算机视觉及数据处理包
 import cv2
 import numpy as np
 import os
-# 质量评价相关函数依赖
 import evaluation
 
 
@@ -162,15 +160,11 @@ def get_dark_channel_image(input_path, output_path):
 
 
 if __name__ == "__main__":
-    get_dark_channel_image(
-        input_path="./rw_haze_test/hazy",
-        output_path="./rw_haze_test/dark_channel_prior"
-    )
     dehaze_test(
-        input_path="./rw_haze_test/hazy",
-        output_path="./rw_haze_test/dehazed"
+        input_path="./hazed-image",
+        output_path="./dehazed-image/dark-channel-prior"
     )
     dehaze_evaluate(
-        input_path="./rw_haze_test/hazy",
-        output_path="./rw_haze_test/dehazed"
+        input_path="./hazed-image",
+        output_path="./dehazed-image/dark-channel-prior"
     )
