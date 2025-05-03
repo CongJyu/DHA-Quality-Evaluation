@@ -139,3 +139,38 @@ def dehaze_evaluate(input_path, output_path):
 # cv2.imshow("dark channel prior dehazing - processed", dehazed_image)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
+
+
+def get_dark_channel_image(input_path, output_path):
+    input_path_list = os.listdir(input_path)
+    if ".DS_Store" in input_path_list:
+        input_path_list.remove(".DS_Store")
+    output_path_list = os.listdir(output_path)
+    if ".DS_Store" in output_path_list:
+        output_path_list.remove(".DS_Store")
+
+    for file_name in input_path_list:
+        input_hazed_image = os.path.join(input_path, file_name)
+        output_dcp_image = os.path.join(output_path, file_name)
+        img = cv2.imread(input_hazed_image)
+        print("[ INFO ] Generating dark channel prior image: ", file_name)
+        single_dcp_channel = get_dark_channel(img=img, size=15)
+        dcp_img = cv2.merge(
+            [single_dcp_channel, single_dcp_channel, single_dcp_channel]
+        )
+        cv2.imwrite(output_dcp_image, dcp_img)
+
+
+if __name__ == "__main__":
+    get_dark_channel_image(
+        input_path="./rw_haze_test/hazy",
+        output_path="./rw_haze_test/dark_channel_prior"
+    )
+    dehaze_test(
+        input_path="./rw_haze_test/hazy",
+        output_path="./rw_haze_test/dehazed"
+    )
+    dehaze_evaluate(
+        input_path="./rw_haze_test/hazy",
+        output_path="./rw_haze_test/dehazed"
+    )
