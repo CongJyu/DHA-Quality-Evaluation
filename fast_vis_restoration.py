@@ -307,5 +307,5 @@ if __name__ == "__main__":
     )
     dehaze_test(
         input_path="./hazed-image",
-        output_path="./dehazed-image/fast-vis-restoration/dehazed"
+        output_path="./dehazed-image/fast-vis-restoration"
     )
