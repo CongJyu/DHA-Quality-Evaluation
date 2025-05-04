@@ -139,7 +139,7 @@ def dehaze_evaluate(input_path, output_path):
 # cv2.destroyAllWindows()
 
 
-def get_dark_channel_image(input_path, output_path):
+def save_dark_channel_image(input_path, output_path):
     input_path_list = os.listdir(input_path)
     if ".DS_Store" in input_path_list:
         input_path_list.remove(".DS_Store")
@@ -161,10 +161,22 @@ def get_dark_channel_image(input_path, output_path):
 
 if __name__ == "__main__":
     dehaze_test(
-        input_path="./hazed-image",
-        output_path="./dehazed-image/dark-channel-prior"
+        input_path="./test-data-dcp/hazy",
+        output_path="./test-data-dcp/dehazed"
     )
     dehaze_evaluate(
-        input_path="./hazed-image",
-        output_path="./dehazed-image/dark-channel-prior"
+        input_path="./test-data-dcp/hazy",
+        output_path="./test-data-dcp/dehazed"
     )
+    save_dark_channel_image(
+        input_path="./test-data-dcp/hazy",
+        output_path="./test-data-dcp/dark-channel-prior"
+    )
+    # dehaze_test(
+    #     input_path="./hazed-image",
+    #     output_path="./dehazed-image/dark-channel-prior"
+    # )
+    # dehaze_evaluate(
+    #     input_path="./hazed-image",
+    #     output_path="./dehazed-image/dark-channel-prior"
+    # )

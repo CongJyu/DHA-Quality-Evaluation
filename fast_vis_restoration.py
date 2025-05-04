@@ -24,6 +24,9 @@ def white_balance(image):
     k_red = k / red_avg
     k_green = k / green_avg
     k_blue = k / blue_avg
+    # red = red * k_red
+    # green = green * k_green
+    # blue = blue * k_blue
     red = cv2.addWeighted(
         src1=red,
         alpha=k_red,
@@ -45,12 +48,77 @@ def white_balance(image):
         beta=0,
         gamma=0
     )
-    balanced_image = cv2.merge(
-        [
-            blue, green, red
-        ]
-    )
+    balanced_image = cv2.merge([red, green, blue])
     return balanced_image
+
+
+def white_balance_old(img_input):
+    '''
+    完美反射白平衡
+    STEP 1: 计算每个像素的R\G\B之和
+    STEP 2: 按R+G+B值的大小计算出其前Ratio%的值作为参考点的的阈值T
+    STEP 3: 对图像中的每个点，计算其中R+G+B值大于T的所有点的R\G\B分量的累积和的平均值
+    STEP 4: 对每个点将像素量化到[0,255]之间
+    依赖ratio值选取而且对亮度最大区域不是白色的图像效果不佳。
+    :param img: cv2.imread读取的图片数据
+    :return: 返回的白平衡结果图片数据
+    '''
+    img = img_input.copy()
+    b, g, r = cv2.split(img)
+    m, n, t = img.shape
+    sum_ = np.zeros(b.shape)
+    for i in range(m):
+        for j in range(n):
+            sum_[i][j] = int(b[i][j]) + int(g[i][j]) + int(r[i][j])
+    hists, bins = np.histogram(sum_.flatten(), 766, [0, 766])
+    Y = 765
+    num, key = 0, 0
+    ratio = 0.01
+    while Y >= 0:
+        num += hists[Y]
+        if num > m * n * ratio / 100:
+            key = Y
+            break
+        Y = Y - 1
+
+    sum_b, sum_g, sum_r = 0, 0, 0
+    time = 0
+    for i in range(m):
+        for j in range(n):
+            if sum_[i][j] >= key:
+                sum_b += b[i][j]
+                sum_g += g[i][j]
+                sum_r += r[i][j]
+                time = time + 1
+
+    avg_b = sum_b / time
+    avg_g = sum_g / time
+    avg_r = sum_r / time
+
+    maxvalue = float(np.max(img))
+    # maxvalue = 255
+    for i in range(m):
+        for j in range(n):
+            b = int(img[i][j][0]) * maxvalue / avg_b
+            g = int(img[i][j][1]) * maxvalue / avg_g
+            r = int(img[i][j][2]) * maxvalue / avg_r
+            if b > 255:
+                b = 255
+            if b < 0:
+                b = 0
+            if g > 255:
+                g = 255
+            if g < 0:
+                g = 0
+            if r > 255:
+                r = 255
+            if r < 0:
+                r = 0
+            img[i][j][0] = b
+            img[i][j][1] = g
+            img[i][j][2] = r
+
+    return img
 
 
 # 获取暗通道
@@ -60,6 +128,13 @@ def get_dark_channel(img, size=20):
     min_channel = cv2.min(r, cv2.min(g, b))  # 取出最小的通道
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))  # 矩形核
     dark_channel_img = cv2.erode(min_channel, kernel)
+    dark_channel_img = cv2.merge(
+        [
+            dark_channel_img,
+            dark_channel_img,
+            dark_channel_img
+        ]
+    )
     return dark_channel_img
 
 
@@ -71,41 +146,98 @@ def get_min_channel(image):
     return min_channel
 
 
+def get_min_channel_fix(image):
+    img_gray = np.zeros((image.shape[0], image.shape[1]), np.float32)
+    for i in range(0, image.shape[0]):
+        for j in range(0, image.shape[1]):
+            localMin = 255
+            for k in range(0, 2):
+                if image.item((i, j, k)) < localMin:
+                    localMin = image.item((i, j, k))
+            img_gray[i, j] = localMin
+    return img_gray
+
+
 # 获取大气面纱
 def get_atmos_veil(image, sv=41, p=0.95):
     # sv 是中值滤波器的使用的方形窗口的大小
     # 因子 p 在 [0, 1] 范围内，控制可见性恢复的强度
-    w_xy = image
-    a_xy = cv2.medianBlur(np.uint8(image), sv)
-    b_xy = np.abs(w_xy - a_xy)
+    w_xy = get_min_channel_fix(image)
+    a_xy = cv2.medianBlur(np.uint8(w_xy), sv)
+    b_xy = w_xy - a_xy
+    b_xy = np.abs(b_xy)
     b_xy = a_xy - cv2.medianBlur(np.uint8(b_xy), sv)
-    max_image = np.ones(b_xy.shape, dtype=np.uint8) * 255
-    min_image = cv2.merge(
-        [np.uint8(p * 8), np.uint8(w_xy), max_image]
-    )
-    min_image = get_min_channel(min_image)
-    min_image[min_image < 0] = 0
-    veil = np.uint8(min_image)
-    veil = cv2.blur(veil, (3, 3))
+    max_255_img = np.ones(b_xy.shape, dtype=np.uint8) * 255
+    min_t = cv2.merge([np.uint8(p * b_xy), np.uint8(w_xy), max_255_img])
+    min_t = get_min_channel_fix(min_t)
+    min_t[min_t < 0] = 0
+    veil = np.uint8(min_t)
+    veil = cv2.blur(veil, (5, 5))
+    # w_xy = get_min_channel_fix(image)
+    # a_xy = cv2.medianBlur(np.uint8(w_xy), sv)
+    # b_xy = np.abs(w_xy - a_xy)
+    # b_xy = a_xy - cv2.medianBlur(np.uint8(b_xy), sv)
+    # max_image = np.ones(b_xy.shape, dtype=np.uint8) * 255
+    # # min_image = cv2.merge(
+    # #     [np.uint8(p * b_xy), np.uint8(w_xy), max_image]
+    # # )
+    # min_image = cv2.min(np.uint8(p * b_xy), cv2.min(np.uint8(w_xy), max_image))
+    # # print("[ DEBUG ] min_image's shape:", min_image.shape)
+    # # min_image = get_min_channel_fix(min_image)
+    # # min_image = get_min_channel(min_image)
+    # min_image[min_image < 0] = 0
+    # # cv2.imshow("min_image", min_image)
+    # # cv2.waitKey(0)
+    # # cv2.destroyAllWindows()
+    # veil = np.uint8(min_image)
+    # veil = cv2.blur(veil, (5, 5))
+    # veil = np.float32(veil) / 255
     return veil
+
+
+def color_correct(img, u):
+    img = np.float64(img) / 255
+    B_mse = np.std(img[:, :, 0])
+    G_mse = np.std(img[:, :, 1])
+    R_mse = np.std(img[:, :, 2])
+
+    B_max = np.mean(img[:, :, 0]) + u * B_mse
+    G_max = np.mean(img[:, :, 1]) + u * G_mse
+    R_max = np.mean(img[:, :, 2]) + u * R_mse
+
+    B_min = np.mean(img[:, :, 0]) - u * B_mse
+    G_min = np.mean(img[:, :, 1]) - u * G_mse
+    R_min = np.mean(img[:, :, 2]) - u * R_mse
+
+    B_cr = (img[:, :, 0] - B_min) / (B_max - B_min)
+    G_cr = (img[:, :, 1] - G_min) / (G_max - G_min)
+    R_cr = (img[:, :, 2] - R_min) / (R_max - R_min)
+
+    img_CR = cv2.merge([B_cr, G_cr, R_cr]) * 255
+    img_CR = np.clip(img_CR, 0, 255)
+    img_CR = np.uint8(img_CR)
+
+    return img_CR
 
 
 # 去雾
 def dehaze(img_input, img_output):
-    img = cv2.imread(img_input)
-    img = img.astype("float32") / 255
-    white_balanced_img = white_balance(img)
-    atmos_veil = get_atmos_veil(white_balanced_img)
-    restored_image = np.zeros(
-        (atmos_veil.shape[0], atmos_veil.shape[1], 3),
-        dtype=np.float32
-    )
-    for i in range(0, 3, 1):
-        restored_image[:, :, i] = (
-            white_balanced_img[:, :, i] - atmos_veil
-        ) / (1 - atmos_veil)
-    restored_image = restored_image / restored_image.max()
-    cv2.imwrite(img_output, restored_image)
+    original_image = cv2.imread(img_input)
+    # original = cv2.resize(original,dsize=None,dst=None,fx=0.2,fy=0.2)
+    white_balanced_img = white_balance(original_image)
+    veil = get_atmos_veil(white_balanced_img)
+    # cv_show('V',np.uint8(V))
+    veil = np.float32(veil) / 255
+    dehazed_img = np.zeros((veil.shape[0], veil.shape[1], 3), dtype=np.float32)
+    white_balanced_img = np.float32(white_balanced_img) / 255
+    for i in range(3):
+        dehazed_img[:, :, i] = (white_balanced_img[:, :, i] - veil) \
+            / (1 - veil)
+    dehazed_img = dehazed_img / dehazed_img.max()
+    dehazed_img = np.clip(dehazed_img, 0, 1)
+    dehazed_img = np.uint8(dehazed_img * 255)
+    dehazed_img = color_correct(dehazed_img, 2)
+    cv2.imwrite(img_output, dehazed_img)
 
 
 # 数据集测试
@@ -124,8 +256,56 @@ def dehaze_test(input_path, output_path):
         dehaze(input_hazed_image, output_dehazed_image)
 
 
+# 保存大气面纱图像
+def save_veil(input_path, output_path):
+    input_path_list = os.listdir(input_path)
+    if ".DS_Store" in input_path_list:
+        input_path_list.remove(".DS_Store")
+    output_path_list = os.listdir(output_path)
+    if ".DS_Store" in output_path_list:
+        output_path_list.remove(".DS_Store")
+
+    for file_name in input_path_list:
+        input_hazed_image = os.path.join(input_path, file_name)
+        output_dehazed_image = os.path.join(output_path, file_name)
+        print("[ INFO ] Getting veil for image: ", file_name)
+        img = cv2.imread(input_hazed_image)
+        veil_image = get_atmos_veil(img)
+        cv2.imwrite(output_dehazed_image, veil_image)
+
+
+# 保存白平衡处理后的图像
+def save_white_balanced_image(input_path, output_path):
+    input_path_list = os.listdir(input_path)
+    if ".DS_Store" in input_path_list:
+        input_path_list.remove(".DS_Store")
+    output_path_list = os.listdir(output_path)
+    if ".DS_Store" in output_path_list:
+        output_path_list.remove(".DS_Store")
+
+    for file_name in input_path_list:
+        input_hazed_image = os.path.join(input_path, file_name)
+        output_dehazed_image = os.path.join(output_path, file_name)
+        print("[ INFO ] Generating white balanced image: ", file_name)
+        img = cv2.imread(input_hazed_image)
+        white_balance_image = white_balance(img)
+        cv2.imwrite(output_dehazed_image, white_balance_image)
+
+
 if __name__ == "__main__":
+    save_white_balanced_image(
+        input_path="./test-data-fvr/hazy",
+        output_path="./test-data-fvr/white-balanced"
+    )
+    save_veil(
+        input_path="./test-data-fvr/hazy",
+        output_path="./test-data-fvr/veil"
+    )
+    dehaze_test(
+        input_path="./test-data-fvr/hazy",
+        output_path="./test-data-fvr/dehazed"
+    )
     dehaze_test(
         input_path="./hazed-image",
-        output_path="./dehazed-image/fast-vis-restoration"
+        output_path="./dehazed-image/fast-vis-restoration/dehazed"
     )

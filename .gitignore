@@ -18,4 +18,5 @@ dehazed-image/
 clear-image/
 samples/
 training-image-AOD-net/
-rw_haze_test/
+test-data-dcp/
+test-data-fvr/
