@@ -54,12 +54,6 @@ def white_balance(image):
 
 def white_balance_old(img_input):
     '''
-    完美反射白平衡
-    STEP 1: 计算每个像素的R\G\B之和
-    STEP 2: 按R+G+B值的大小计算出其前Ratio%的值作为参考点的的阈值T
-    STEP 3: 对图像中的每个点，计算其中R+G+B值大于T的所有点的R\G\B分量的累积和的平均值
-    STEP 4: 对每个点将像素量化到[0,255]之间
-    依赖ratio值选取而且对亮度最大区域不是白色的图像效果不佳。
     :param img: cv2.imread读取的图片数据
     :return: 返回的白平衡结果图片数据
     '''
@@ -223,10 +217,8 @@ def color_correct(img, u):
 # 去雾
 def dehaze(img_input, img_output):
     original_image = cv2.imread(img_input)
-    # original = cv2.resize(original,dsize=None,dst=None,fx=0.2,fy=0.2)
     white_balanced_img = white_balance(original_image)
     veil = get_atmos_veil(white_balanced_img)
-    # cv_show('V',np.uint8(V))
     veil = np.float32(veil) / 255
     dehazed_img = np.zeros((veil.shape[0], veil.shape[1], 3), dtype=np.float32)
     white_balanced_img = np.float32(white_balanced_img) / 255
