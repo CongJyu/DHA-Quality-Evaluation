@@ -4,7 +4,6 @@
 import cv2
 import numpy as np
 import os
-import evaluation
 
 
 # 根据 Kaiming He 的论文描述求取图像的暗通道
@@ -101,32 +100,32 @@ def dehaze_test(input_path, output_path):
 
 
 # 数据集评估
-def dehaze_evaluate(input_path, output_path):
-    input_path_list = os.listdir(input_path)
-    if ".DS_Store" in input_path_list:
-        input_path_list.remove(".DS_Store")
-    elif input_path_list is not None:
-        print("[ FAIL ] Original image path is empty.")
-    output_path_list = os.listdir(output_path)
-    if ".DS_Store" in output_path_list:
-        output_path_list.remove(".DS_Store")
-    elif output_path_list is not None:
-        print("[ FAIL ] Dehazed image path is empty.")
+# def dehaze_evaluate(input_path, output_path):
+#     input_path_list = os.listdir(input_path)
+#     if ".DS_Store" in input_path_list:
+#         input_path_list.remove(".DS_Store")
+#     elif input_path_list is not None:
+#         print("[ FAIL ] Original image path is empty.")
+#     output_path_list = os.listdir(output_path)
+#     if ".DS_Store" in output_path_list:
+#         output_path_list.remove(".DS_Store")
+#     elif output_path_list is not None:
+#         print("[ FAIL ] Dehazed image path is empty.")
 
-    print("Image    \tPSNR     \tSSIM\n---------\t---------\t---------")
-    for file_name in input_path_list:
-        # original_image_path = os.path.join(input_path, file_name)
-        original_image_path = os.path.join("./clear-image", file_name)
-        dehazed_image_path = os.path.join(output_path, file_name)
-        original_image = cv2.imread(original_image_path)
-        original_image = original_image.astype("float32") / 255
-        dehazed_image = cv2.imread(dehazed_image_path)
-        dehazed_image = dehazed_image.astype("float32") / 255
-        current_psnr = round(evaluation.compare_psnr(
-            original_image, dehazed_image), 6)
-        current_ssim = round(evaluation.compare_ssim(
-            original_image, dehazed_image, win_size=7, data_range=255, channel_axis=2), 6)
-        print(file_name, "\t", current_psnr, "\t", current_ssim)
+#     print("Image    \tPSNR     \tSSIM\n---------\t---------\t---------")
+#     for file_name in input_path_list:
+#         # original_image_path = os.path.join(input_path, file_name)
+#         original_image_path = os.path.join("./clear-image", file_name)
+#         dehazed_image_path = os.path.join(output_path, file_name)
+#         original_image = cv2.imread(original_image_path)
+#         original_image = original_image.astype("float32") / 255
+#         dehazed_image = cv2.imread(dehazed_image_path)
+#         dehazed_image = dehazed_image.astype("float32") / 255
+#         current_psnr = round(evaluation.compare_psnr(
+#             original_image, dehazed_image), 6)
+#         current_ssim = round(evaluation.compare_ssim(
+#             original_image, dehazed_image, win_size=7, data_range=255, channel_axis=2), 6)
+#         print(file_name, "\t", current_psnr, "\t", current_ssim)
 
 
 # 测试图像读取并对比显示
@@ -164,10 +163,10 @@ if __name__ == "__main__":
         input_path="./test-data-dcp/hazy",
         output_path="./test-data-dcp/dehazed"
     )
-    dehaze_evaluate(
-        input_path="./test-data-dcp/hazy",
-        output_path="./test-data-dcp/dehazed"
-    )
+    # dehaze_evaluate(
+    #     input_path="./test-data-dcp/hazy",
+    #     output_path="./test-data-dcp/dehazed"
+    # )
     save_dark_channel_image(
         input_path="./test-data-dcp/hazy",
         output_path="./test-data-dcp/dark-channel-prior"
