@@ -9,6 +9,7 @@ dependencies = [
     "matplotlib==3.10.1",
     "numpy==2.2.5",
     "opencv-python==4.11.0.86",
+    "pandas>=2.2.3",
     "pillow==11.2.1",
     "prefetch-generator==1.0.3",
     "scikit-image==0.25.2",

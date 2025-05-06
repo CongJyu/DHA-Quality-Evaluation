@@ -12,7 +12,6 @@ from PIL import Image
 import cv2
 import glob
 import os
-import evaluation
 
 
 # 设置训练 AOD-Net 使用的设备
@@ -69,32 +68,32 @@ def dehaze_image(image_path):
 
 
 # 数据集评估
-def dehaze_evaluate(input_path, output_path):
-    input_path_list = os.listdir(input_path)
-    if ".DS_Store" in input_path_list:
-        input_path_list.remove(".DS_Store")
-    elif input_path_list is not None:
-        print("[ FAIL ] Original image path is empty.")
-    output_path_list = os.listdir(output_path)
-    if ".DS_Store" in output_path_list:
-        output_path_list.remove(".DS_Store")
-    elif output_path_list is not None:
-        print("[ FAIL ] Dehazed image path is empty.")
+# def dehaze_evaluate(input_path, output_path):
+#     input_path_list = os.listdir(input_path)
+#     if ".DS_Store" in input_path_list:
+#         input_path_list.remove(".DS_Store")
+#     elif input_path_list is not None:
+#         print("[ FAIL ] Original image path is empty.")
+#     output_path_list = os.listdir(output_path)
+#     if ".DS_Store" in output_path_list:
+#         output_path_list.remove(".DS_Store")
+#     elif output_path_list is not None:
+#         print("[ FAIL ] Dehazed image path is empty.")
 
-    print("Image    \tPSNR     \tSSIM\n---------\t---------\t---------")
-    for file_name in input_path_list:
-        # original_image_path = os.path.join(input_path, file_name)
-        original_image_path = os.path.join("./clear-image", file_name)
-        dehazed_image_path = os.path.join(output_path, file_name)
-        original_image = cv2.imread(original_image_path)
-        original_image = original_image.astype("float32") / 255
-        dehazed_image = cv2.imread(dehazed_image_path)
-        dehazed_image = dehazed_image.astype("float32") / 255
-        current_psnr = round(evaluation.compare_psnr(
-            original_image, dehazed_image), 6)
-        current_ssim = round(evaluation.compare_ssim(
-            original_image, dehazed_image, win_size=7, data_range=255, channel_axis=2), 6)
-        print(file_name, "\t", current_psnr, "\t", current_ssim)
+#     print("Image    \tPSNR     \tSSIM\n---------\t---------\t---------")
+#     for file_name in input_path_list:
+#         # original_image_path = os.path.join(input_path, file_name)
+#         original_image_path = os.path.join("./clear-image", file_name)
+#         dehazed_image_path = os.path.join(output_path, file_name)
+#         original_image = cv2.imread(original_image_path)
+#         original_image = original_image.astype("float32") / 255
+#         dehazed_image = cv2.imread(dehazed_image_path)
+#         dehazed_image = dehazed_image.astype("float32") / 255
+#         current_psnr = round(evaluation.compare_psnr(
+#             original_image, dehazed_image), 6)
+#         current_ssim = round(evaluation.compare_ssim(
+#             original_image, dehazed_image, win_size=7, data_range=255, channel_axis=2), 6)
+#         print(file_name, "\t", current_psnr, "\t", current_ssim)
 
 
 if __name__ == "__main__":
@@ -112,7 +111,7 @@ if __name__ == "__main__":
         # print(image, "done!")
     print("[ INFO ] Success. All images done.")
 
-    dehaze_evaluate(
-        input_path="./hazed-image",
-        output_path="./dehazed-image/AOD-net"
-    )
+    # dehaze_evaluate(
+    #     input_path="./hazed-image",
+    #     output_path="./dehazed-image/AOD-net"
+    # )
