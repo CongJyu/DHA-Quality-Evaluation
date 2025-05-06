@@ -62,6 +62,7 @@ def get_psnr(original_image_dir, dehazed_image_dir):
         return -1
 
     psnr_result = []
+    cols = ["Image File", "PSNR"]
 
     # 检查去雾后的图像个数与原无雾图像个数是否对应
     if is_size_match(original_image_list, dehazed_image_list):
@@ -82,12 +83,13 @@ def get_psnr(original_image_dir, dehazed_image_dir):
                 original_image, dehazed_image,
             ), 6
         )
-        current_result = [file_name, current_psnr]
-        psnr_result.append(current_psnr)
+        current_result = [file_name, str(current_psnr)]
+        psnr_result.append(current_result)
 
     with open("FR-IQA-PSNR.csv", mode="w", newline="") as result_file:
-        result_writer = csv.writer(result_file)
-        result_writer.writerow(psnr_result)
+        result = pandas.DataFrame(columns=cols, data=psnr_result)
+        print("[ DEBUG ] Result CSV:\n", result)
+        result.to_csv("FVR_FR_IQA_PSNR.csv", encoding="UTF-8")
 
 
 if __name__ == "__main__":
