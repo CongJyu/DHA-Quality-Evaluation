@@ -13,10 +13,9 @@ wheels/
 *.DS_Store
 
 # Datasets
-hazed-image/
-dehazed-image/
-clear-image/
 samples/
 training-image-AOD-net/
 test-data-dcp/
 test-data-fvr/
+test-data-aod/
+test-data-hist/

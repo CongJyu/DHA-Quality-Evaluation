@@ -104,7 +104,7 @@ if __name__ == "__main__":
         print("[ INFO ] Start process with CUDA\n")
     else:
         print("[ INFO ] Start process with CPU\n")
-    test_list = glob.glob("test-data-aod/hazy/*")
+    test_list = glob.glob("./test-data-aod/hazy/*")
     for image in test_list:
         print("[ INFO ] Processing image: ", image)
         dehaze_image(image)

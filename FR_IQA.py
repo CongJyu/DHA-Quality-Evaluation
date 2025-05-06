@@ -196,3 +196,35 @@ if __name__ == "__main__":
         dehazed_image_dir="./test-data-fvr/dehazed",
         result_save_dir="./test-data-fvr/evaluate"
     )
+    # AOD-Net
+    get_mse(
+        original_image_dir="./test-data-aod/GT",
+        dehazed_image_dir="./test-data-aod/dehazed",
+        result_save_dir="./test-data-aod/evaluate"
+    )
+    get_psnr(
+        original_image_dir="./test-data-aod/GT",
+        dehazed_image_dir="./test-data-aod/dehazed",
+        result_save_dir="./test-data-aod/evaluate"
+    )
+    get_ssim(
+        original_image_dir="./test-data-aod/GT",
+        dehazed_image_dir="./test-data-aod/dehazed",
+        result_save_dir="./test-data-aod/evaluate"
+    )
+    # 直方图均衡化图像增强
+    get_mse(
+        original_image_dir="./test-data-hist/GT",
+        dehazed_image_dir="./test-data-hist/dehazed",
+        result_save_dir="./test-data-hist/evaluate"
+    )
+    get_psnr(
+        original_image_dir="./test-data-hist/GT",
+        dehazed_image_dir="./test-data-hist/dehazed",
+        result_save_dir="./test-data-hist/evaluate"
+    )
+    get_ssim(
+        original_image_dir="./test-data-hist/GT",
+        dehazed_image_dir="./test-data-hist/dehazed",
+        result_save_dir="./test-data-hist/evaluate"
+    )

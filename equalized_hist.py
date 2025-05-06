@@ -69,8 +69,8 @@ def dehaze_test(input_path, output_path):
 
 if __name__ == "__main__":
     dehaze_test(
-        input_path="./hazed-image",
-        output_path="./dehazed-image/equalized-hist"
+        input_path="./test-data-hist/hazy",
+        output_path="./test-data-hist/dehazed"
     )
     # dehaze_evaluate(
     #     input_path="./hazed-image",
