@@ -48,18 +48,14 @@ def get_mse(original_image_dir, dehazed_image_dir, result_save_dir):
             os.path.join(dehazed_image_dir, file_name)
         )
         # 计算 MSE
-        current_psnr = np.round(
-            skimage.metrics.peak_signal_noise_ratio(
-                original_image, dehazed_image,
-            ), 6
-        )
-        current_result = [file_name, str(current_psnr)]
-        mse_result.append(current_result)
+        
+        # current_result = [file_name, str(current_mse)]
+        # mse_result.append(current_result)
 
         result = pandas.DataFrame(columns=cols, data=mse_result)
         print("[ DEBUG ] Result CSV:\n", result)
         result.to_csv(
-            os.path.join(result_save_dir, "FVR_FR_IQA_PSNR.csv"),
+            os.path.join(result_save_dir, "FR_IQA_PSNR.csv"),
             encoding="UTF-8"
         )
 
@@ -107,7 +103,7 @@ def get_psnr(original_image_dir, dehazed_image_dir, result_save_dir):
         result = pandas.DataFrame(columns=cols, data=psnr_result)
         print("[ DEBUG ] PSNR Result CSV:\n", result)
         result.to_csv(
-            os.path.join(result_save_dir, "FVR_FR_IQA_PSNR.csv"),
+            os.path.join(result_save_dir, "FR_IQA_PSNR.csv"),
             encoding="UTF-8"
         )
 
@@ -156,12 +152,24 @@ def get_ssim(original_image_dir, dehazed_image_dir, result_save_dir):
         result = pandas.DataFrame(columns=cols, data=ssim_result)
         print("[ DEBUG ] SSIM Result CSV:\n", result)
         result.to_csv(
-            os.path.join(result_save_dir, "FVR_FR_IQA_SSIM.csv"),
+            os.path.join(result_save_dir, "FR_IQA_SSIM.csv"),
             encoding="UTF-8"
         )
 
 
 if __name__ == "__main__":
+    # 暗通道先验去雾
+    get_psnr(
+        original_image_dir="./test-data-dcp/GT",
+        dehazed_image_dir="./test-data-dcp/dehazed",
+        result_save_dir="./test-data-dcp/evaluate"
+    )
+    get_ssim(
+        original_image_dir="./test-data-dcp/GT",
+        dehazed_image_dir="./test-data-dcp/dehazed",
+        result_save_dir="./test-data-dcp/evaluate"
+    )
+    # 快速恢复单色或灰度图像可见性
     get_psnr(
         original_image_dir="./test-data-fvr/GT",
         dehazed_image_dir="./test-data-fvr/dehazed",
