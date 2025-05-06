@@ -37,6 +37,9 @@ def get_mse(original_image_dir, dehazed_image_dir):
         print("[ FAIL ] File list is not matched. Stop.")
         return -1
 
+    mse_result = []
+    cols = ["Image File", "MSE"]
+
     for file_name in dehazed_image_list:
         original_image = cv2.imread(
             os.path.join(original_image_dir, file_name)
@@ -44,10 +47,23 @@ def get_mse(original_image_dir, dehazed_image_dir):
         dehazed_image = cv2.imread(
             os.path.join(dehazed_image_dir, file_name)
         )
+        # 计算 MSE
+        current_psnr = np.round(
+            skimage.metrics.peak_signal_noise_ratio(
+                original_image, dehazed_image,
+            ), 6
+        )
+        current_result = [file_name, str(current_psnr)]
+        mse_result.append(current_result)
+
+    with open("FR-IQA-PSNR.csv", mode="w", newline="") as result_file:
+        result = pandas.DataFrame(columns=cols, data=mse_result)
+        print("[ DEBUG ] Result CSV:\n", result)
+        result.to_csv("FVR_FR_IQA_MSE.csv", encoding="UTF-8")
 
 
 # 评估峰值信噪比 PSNR
-def get_psnr(original_image_dir, dehazed_image_dir):
+def get_psnr(original_image_dir, dehazed_image_dir, result_save_dir):
     original_image_list = os.listdir(original_image_dir)
     if ".DS_Store" in original_image_list:
         original_image_list.remove(".DS_Store")
@@ -89,11 +105,15 @@ def get_psnr(original_image_dir, dehazed_image_dir):
     with open("FR-IQA-PSNR.csv", mode="w", newline="") as result_file:
         result = pandas.DataFrame(columns=cols, data=psnr_result)
         print("[ DEBUG ] Result CSV:\n", result)
-        result.to_csv("FVR_FR_IQA_PSNR.csv", encoding="UTF-8")
+        result.to_csv(
+            os.path.join(result_save_dir, "FVR_FR_IQA_PSNR.csv"),
+            encoding="UTF-8"
+        )
 
 
 if __name__ == "__main__":
     get_psnr(
         original_image_dir="./test-data-fvr/GT",
-        dehazed_image_dir="./test-data-fvr/dehazed"
+        dehazed_image_dir="./test-data-fvr/dehazed",
+        result_save_dir="./test-data-fvr"
     )
