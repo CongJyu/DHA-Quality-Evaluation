@@ -46,15 +46,22 @@ def get_mse(original_image_dir, dehazed_image_dir, result_save_dir):
         dehazed_image = cv2.imread(
             os.path.join(dehazed_image_dir, file_name)
         )
-        # 计算 MSE
 
-        # current_result = [file_name, str(current_mse)]
-        # mse_result.append(current_result)
+        # 转换成灰度图像
+        original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
+        dehazed_image = cv2.cvtColor(dehazed_image, cv2.COLOR_BGR2GRAY)
+        # 计算 MSE
+        current_mse = np.sum(
+            cv2.subtract(original_image, dehazed_image) ** 2
+        ) / float(original_image.shape[0] * original_image.shape[1])
+
+        current_result = [file_name, str(current_mse)]
+        mse_result.append(current_result)
 
         result = pandas.DataFrame(columns=cols, data=mse_result)
-        print("[ DEBUG ] Result CSV:\n", result)
+        print("[ DEBUG ] MSE Result CSV:\n", result)
         result.to_csv(
-            os.path.join(result_save_dir, "FR_IQA_PSNR.csv"),
+            os.path.join(result_save_dir, "FR_IQA_MSE.csv"),
             encoding="UTF-8"
         )
 
@@ -158,6 +165,11 @@ def get_ssim(original_image_dir, dehazed_image_dir, result_save_dir):
 
 if __name__ == "__main__":
     # 暗通道先验去雾
+    get_mse(
+        original_image_dir="./test-data-dcp/GT",
+        dehazed_image_dir="./test-data-dcp/dehazed",
+        result_save_dir="./test-data-dcp/evaluate"
+    )
     get_psnr(
         original_image_dir="./test-data-dcp/GT",
         dehazed_image_dir="./test-data-dcp/dehazed",
@@ -169,6 +181,11 @@ if __name__ == "__main__":
         result_save_dir="./test-data-dcp/evaluate"
     )
     # 快速恢复单色或灰度图像可见性
+    get_mse(
+        original_image_dir="./test-data-fvr/GT",
+        dehazed_image_dir="./test-data-fvr/dehazed",
+        result_save_dir="./test-data-fvr/evaluate"
+    )
     get_psnr(
         original_image_dir="./test-data-fvr/GT",
         dehazed_image_dir="./test-data-fvr/dehazed",
