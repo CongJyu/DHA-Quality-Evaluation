@@ -63,7 +63,7 @@ def dehaze_image(image_path):
     # torchvision.utils.save_image(torch.cat(
     #     (data_hazy, clean_image), 0), "results/" + image_path.split("/")[-1])
     torchvision.utils.save_image(
-        clean_image, "./dehazed-image/AOD-net/" + image_path.split("/")[-1]
+        clean_image, "./test-data-aod/dehazed/" + image_path.split("/")[-1]
     )
 
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         print("[ INFO ] Start process with CUDA\n")
     else:
         print("[ INFO ] Start process with CPU\n")
-    test_list = glob.glob("hazed-image/*")
+    test_list = glob.glob("test-data-aod/hazy/*")
     for image in test_list:
         print("[ INFO ] Processing image: ", image)
         dehaze_image(image)
