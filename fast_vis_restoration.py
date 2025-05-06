@@ -226,7 +226,7 @@ def dehaze(img_input, img_output):
     dehazed_img = dehazed_img / dehazed_img.max()
     dehazed_img = np.clip(dehazed_img, 0, 1)
     dehazed_img = np.uint8(dehazed_img * 255)
-    # dehazed_img = color_correct(dehazed_img, 2)
+    dehazed_img = color_correct(dehazed_img, 2)
     cv2.imwrite(img_output, dehazed_img)
 
 
