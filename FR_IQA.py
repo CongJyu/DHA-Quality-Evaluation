@@ -8,7 +8,6 @@ import cv2
 import os
 import skimage
 import pandas
-import csv
 
 
 def is_size_match(file_list_1, file_list_2):
@@ -48,7 +47,7 @@ def get_mse(original_image_dir, dehazed_image_dir, result_save_dir):
             os.path.join(dehazed_image_dir, file_name)
         )
         # 计算 MSE
-        
+
         # current_result = [file_name, str(current_mse)]
         # mse_result.append(current_result)
 
