@@ -1,4 +1,4 @@
-# 图像去雾质量评价 PSNR 峰值信噪比指标 与 SSIM 结构相似性指标 实现
+# 图像去雾质量评价 FR-IQA 实现
 # 湖南大学 信息科学与工程学院 通信工程 陈昶宇
 
 
@@ -50,9 +50,11 @@ def get_mse(original_image_dir, dehazed_image_dir, result_save_dir):
         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
         dehazed_image = cv2.cvtColor(dehazed_image, cv2.COLOR_BGR2GRAY)
         # 计算 MSE
-        current_mse = np.sum(
-            cv2.subtract(original_image, dehazed_image) ** 2
-        ) / float(original_image.shape[0] * original_image.shape[1])
+        current_mse = np.round(
+            np.sum(
+                cv2.subtract(original_image, dehazed_image) ** 2
+            ) / float(original_image.shape[0] * original_image.shape[1]), 6
+        )
 
         current_result = [file_name, str(current_mse)]
         mse_result.append(current_result)

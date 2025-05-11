@@ -17,7 +17,7 @@ import random
 
 
 # AOD_dataloader
-random.seed(202108030122)
+random.seed(2025)
 # 设置训练 AOD-Net 使用的设备
 if torch.mps.is_available():
     training_device = torch.device("mps")
