@@ -1,4 +1,4 @@
-# The Reproduction of the AOD-Net End-to-End Dehazing Network.
+# The Reproduction of the AOD-Net End-to-End Dehazing Network
 # Rain CongJyu CHEN
 
 # Refs: https://github.com/MayankSingal/PyTorch-Image-Dehazing

@@ -1,4 +1,4 @@
-# Reproduction of Restore Visibility from Single Colour or Gray-Scale Images method
+# Reproduction of Restore Visibility from Single Colour or Gray-Scale Images Method
 # Rain CongJyu CHEN
 
 # Import computer vision libraries.

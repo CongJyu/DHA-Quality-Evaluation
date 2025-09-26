@@ -1,28 +1,28 @@
-# 直方图均衡化去雾 复现
-# 湖南大学 信息科学与工程学院 通信工程 陈昶宇
+# Reproduction of Histogram Equalization Dehazing Method
+# Rain CongJyu CHEN
 
 import cv2
-import numpy as np
 import os
 
 
-# 传统图像增强方法
+# Traditional image enhancement methods.
 def dehaze(img_input, img_output):
-    # 读取含雾图像（彩色）
+    # Read foggy image (color).
     img = cv2.imread(img_input)
-    # 拆分颜色通道
+    # Split color channels.
     b, g, r = cv2.split(img)
-    # 对每个颜色通道分别使用灰度直方图均衡化方法去雾
+    # Use grayscale histogram equalization method to remove fog for each color channel.
     b_channel_equalized = cv2.equalizeHist(b)
     g_channel_equalized = cv2.equalizeHist(g)
     r_channel_equalized = cv2.equalizeHist(r)
-    # 合并
+    # Merge.
     equalized_image = cv2.merge(
-        (b_channel_equalized, g_channel_equalized, r_channel_equalized))
+        (b_channel_equalized, g_channel_equalized, r_channel_equalized)
+    )
     cv2.imwrite(img_output, equalized_image)
 
 
-# 数据集测试
+# Test datasets.
 def dehaze_test(input_path, output_path):
     input_path_list = os.listdir(input_path)
     if ".DS_Store" in input_path_list:
@@ -38,7 +38,7 @@ def dehaze_test(input_path, output_path):
         dehaze(input_hazed_image, output_dehazed_image)
 
 
-# 数据集评估
+# Evaluate datasets.
 # def dehaze_evaluate(input_path, output_path):
 #     input_path_list = os.listdir(input_path)
 #     if ".DS_Store" in input_path_list:
@@ -77,25 +77,25 @@ if __name__ == "__main__":
     #     output_path="./dehazed-image/equalized-hist"
     # )
 
-# 读取输入图像
+# Read input image.
 # input_image = cv2.imread("./hazed-image/haze-3.jpg")
 
-# 颜色通道拆分
+# Color channel splitting.
 # b, g, r = cv2.split(input_image)
 
-# 对每个通道分别进行直方图均衡化
+# Perform histogram equalization on each channel separately.
 # b_channel_equal = cv2.equalizeHist(b)
 # g_channel_equal = cv2.equalizeHist(g)
 # r_channel_equal = cv2.equalizeHist(r)
 
-# 合并均衡化后的三个通道
+# Merge the three equalized channels.
 # equalized_image = cv2.merge(
-    # (b_channel_equal, g_channel_equal, r_channel_equal))
+# (b_channel_equal, g_channel_equal, r_channel_equal))
 
-# 保存去雾结果
+# Save the dehazing results.
 # cv2.imwrite("./dehazed-image/equalized-image-3.jpg", equalized_image)
 
-# 显示测试
+# Display tests.
 # cv2.imshow("Original Image", input_image)
 # cv2.imshow("Dehazed Image - Equalized", equalized_image)
 # cv2.waitKey(0)

@@ -1,44 +1,48 @@
-# 暗通道先验去雾 复现
-# 湖南大学 信息科学与工程学院 通信工程 陈昶宇
+# Reproduction of Dark Channel Prior Method
+# Rain CongJyu CHEN
 
 import cv2
 import numpy as np
 import os
 
 
-# 根据 Kaiming He 的论文描述求取图像的暗通道
+# Compute the dark channel according to Kaiming He's paper.
 def get_dark_channel(img, size=20):
-    # size 是窗口的大小，窗口越大则包含暗通道的概率越大，暗通道就越黑
-    r, g, b = cv2.split(img)  # 把图像拆分出 R, G, B 三个通道
-    min_channel = cv2.min(r, cv2.min(g, b))  # 取出最小的通道
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))  # 矩形核
+    # `size` is the size of the window.
+    # The larger the window, the greater the probability of containing a dark channel,
+    # and the darker the dark channel.
+    r, g, b = cv2.split(img)  # Split the image into three channels: R, G, and B.
+    min_channel = cv2.min(r, cv2.min(g, b))  # Take out the smallest channel.
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))  # Rectangle kernel.
     dark_channel_img = cv2.erode(min_channel, kernel)
     return dark_channel_img
 
-# 去雾模型 I(x) = J(x)t(x) + A[1 - t(x)]
-# 常量参数 w (0 < w < 1) 控制去雾的程度
-# 透射率 t(x) = 1 - w * min(I_c(y) / A_c)
+
+# Dehazing Model: I(x) = J(x)t(x) + A[1 - t(x)]
+# Constant parametre: w (0 < w < 1) controls the degree of dehazing.
+# Transmittance: t(x) = 1 - w * min(I_c(y) / A_c)
 # J(x) = (I(x) - A) / (max(t(x), t_0)) + A
 
 
-# 估计全球大气光
-# percent 指定图像中最亮像素的百分比
+# Estimated global atmospheric light.
+# `percent` specifies the percentage of brightest pixels in the image.
 def get_atmos_light(img, percent=0.001):
-    mean_per_pixel = np.mean(img, axis=2).reshape(-1)  # 计算图像每个像素的平均值，拉平成一维数组
-    # 选取最亮 percent 部分的像素
+    # Calculate the average value of each pixel in the image and flatten it into a one-dimensional array.
+    mean_per_pixel = np.mean(img, axis=2).reshape(-1)
+    # Select the brightest percent pixels.
     mean_per_pixel = np.sort(mean_per_pixel)[::-1]
     mean_top = mean_per_pixel[:int(img.shape[0] * img.shape[1] * percent)]
     return np.mean(mean_top)
 
 
-# 估计透射率
+# Estimate transmittance.
 def get_trans(img, atm, w=0.95):
     x = img / atm
     t = 1 - w * get_dark_channel(x, 20)
     return t
 
 
-# 引导滤波
+# Guided filtering.
 def guided_filter(p, i, r, e):
     # p: input image
     # i: guidance image
@@ -66,7 +70,7 @@ def guided_filter(p, i, r, e):
     return q
 
 
-# 去雾
+# Dehaze.
 def dehaze(img_input, img_output):
     img = cv2.imread(img_input)
     img = img.astype("float32") / 255
@@ -79,11 +83,11 @@ def dehaze(img_input, img_output):
     result = np.empty_like(img)
     for i in range(3):
         result[:, :, i] = (img[:, :, i] - atmos_light) / \
-            trans_guided + atmos_light
+                          trans_guided + atmos_light
     cv2.imwrite(img_output, result * 255)
 
 
-# 数据集测试
+# Test dataset.
 def dehaze_test(input_path, output_path):
     input_path_list = os.listdir(input_path)
     if ".DS_Store" in input_path_list:
@@ -99,7 +103,7 @@ def dehaze_test(input_path, output_path):
         dehaze(input_hazed_image, output_dehazed_image)
 
 
-# 数据集评估
+# Evaluate dataset.
 # def dehaze_evaluate(input_path, output_path):
 #     input_path_list = os.listdir(input_path)
 #     if ".DS_Store" in input_path_list:
@@ -128,7 +132,7 @@ def dehaze_test(input_path, output_path):
 #         print(file_name, "\t", current_psnr, "\t", current_ssim)
 
 
-# 测试图像读取并对比显示
+# Test image reading and comparison display.
 # hazed_image = cv2.imread(input_path)
 # dehazed_image = cv2.imread(output_path)
 # dehaze(hazed_image, dehazed_image)

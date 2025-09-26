@@ -1,4 +1,4 @@
-# The implementation of FR-IQA method.
+# The Implementation of FR-IQA Method
 # Rain CongJyu CHEN
 
 import numpy as np
