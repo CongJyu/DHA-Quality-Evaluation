@@ -9,9 +9,7 @@ import torch
 import torchvision
 import numpy as np
 from PIL import Image
-import cv2
 import glob
-import os
 
 
 # 设置训练 AOD-Net 使用的设备
