@@ -1,9 +1,9 @@
-# AOD-Net 端到端去雾网络 复现
-# 湖南大学 信息科学与工程学院 通信工程 陈昶宇
+# The Reproduction of the AOD-Net End-to-End Dehazing Network.
+# Rain CongJyu CHEN
 
-# 参考 https://github.com/MayankSingal/PyTorch-Image-Dehazing 代码进行修改
+# Refs: https://github.com/MayankSingal/PyTorch-Image-Dehazing
 
-# AOD-Net 训练程序
+# AOD-Net Training Program
 
 import torch
 import torchvision
@@ -15,10 +15,9 @@ from PIL import Image
 import glob
 import random
 
-
 # AOD_dataloader
 random.seed(2025)
-# 设置训练 AOD-Net 使用的设备
+# Set device for training AOD-Net.
 if torch.mps.is_available():
     training_device = torch.device("mps")
 elif torch.cuda.is_available():
@@ -28,33 +27,33 @@ else:
 
 
 def populate_train_list(orig_images_path, hazy_images_path):
-    # 初始化两个列表
+    # Initialize two lists.
     train_list = []
     val_list = []
-    # 获取所有的含雾图像
-    # 使用 glob 获取指定目录下的 jpg 格式的文件
+    # Get all hazed images.
+    # Use `glob` to get jpg files from certain directory.
     image_list_haze = glob.glob(hazy_images_path + "*.jpg")
-    # 构建映射关系
+    # Build mapping.
     tmp_dict = {}
-    # 提取关键字 key
+    # Extract key word.
     for image in image_list_haze:
         image = image.split("/")[-1]
         # image = image.split("/")[-1][5:]  # changed
         key = image.split("_")[0] + "_" + image.split("_")[1] + ".jpg"
-        # 储存含雾图像的映射
-        # key 为原始的清晰图像的名称
+        # Store mapping of hazed images.
+        # `key` is the name of clear images.
         if key in tmp_dict.keys():
             tmp_dict[key].append(image)
         else:
             tmp_dict[key] = []
             tmp_dict[key].append(image)
-    # 划分训练集和验证集
-    # 其中训练集存放于 train_keys 列表中
-    # 验证集存放于 val_keys 列表中
+    # Divide training set and testing set.
+    # Training set is put in list `train_keys`.
+    # Testing set is put in list `val_keys`.
     train_keys = []
     val_keys = []
     len_keys = len(tmp_dict.keys())
-    # 90% 的数据用于训练，10% 的数据用于验证
+    # 90% of the data for training, and 10% for testing and verifying.
     for i in range(len_keys):
         if i < len_keys * 9 / 10:
             train_keys.append(list(tmp_dict.keys())[i])
@@ -63,20 +62,20 @@ def populate_train_list(orig_images_path, hazy_images_path):
     for key in list(tmp_dict.keys()):
         if key in train_keys:
             for hazy_image in tmp_dict[key]:
-                # train_list 是清晰图像路径和对应的含雾图像的路径
+                # `train_list` is the path to clear images and hazed images.
                 train_list.append(
                     [orig_images_path + key, hazy_images_path + hazy_image]
                 )
         else:
             for hazy_image in tmp_dict[key]:
-                # val_list 是清晰图像和对应的含雾图像的路径
+                # `val_list` is the path to clear images and hazed images.
                 val_list.append(
                     [orig_images_path + key, hazy_images_path + hazy_image]
                 )
-    # 随机打乱训练集和验证集
+    # Shuffle the training set and the testing set.
     random.shuffle(train_list)
     random.shuffle(val_list)
-    # 返回最终数据集列表
+    # Return the final dataset list.
     return train_list, val_list
 
 
@@ -100,8 +99,8 @@ class dehazing_loader(torch.utils.data.Dataset):
         # data_hazy = data_hazy.resize((480, 640), Image.ANTIALIAS)
         data_orig = data_orig.resize((480, 640), Image.Resampling.LANCZOS)
         data_hazy = data_hazy.resize((480, 640), Image.Resampling.LANCZOS)
-        data_orig = (np.asarray(data_orig)/255.0)
-        data_hazy = (np.asarray(data_hazy)/255.0)
+        data_orig = (np.asarray(data_orig) / 255.0)
+        data_hazy = (np.asarray(data_hazy) / 255.0)
         data_orig = torch.from_numpy(data_orig).float()
         data_hazy = torch.from_numpy(data_hazy).float()
         return data_orig.permute(2, 0, 1), data_hazy.permute(2, 0, 1)
@@ -187,12 +186,12 @@ def train(config):
                 config.grad_clip_norm
             )
             optimizer.step()
-            if ((iteration+1) % config.display_iter) == 0:
+            if ((iteration + 1) % config.display_iter) == 0:
                 print(
                     f"[ INFO ] Current epoch: {epoch}",
                     ", Loss at iteration", iteration + 1, ":", loss.item()
                 )
-            if ((iteration+1) % config.snapshot_iter) == 0:
+            if ((iteration + 1) % config.snapshot_iter) == 0:
                 torch.save(
                     dehaze_net.state_dict(),
                     config.snapshots_folder + "Epoch" + str(epoch) + '.pth'
@@ -206,7 +205,7 @@ def train(config):
             clean_image = dehaze_net(img_haze)
             torchvision.utils.save_image(
                 torch.cat((img_haze, clean_image, img_orig), 0),
-                config.sample_output_folder+str(iter_val+1)+".jpg"
+                config.sample_output_folder + str(iter_val + 1) + ".jpg"
             )
         torch.save(
             dehaze_net.state_dict(),
@@ -215,17 +214,17 @@ def train(config):
 
 
 if __name__ == "__main__":
-    # 设备提示
+    # Notice for devices.
     if torch.mps.is_available():
         print("[ INFO ] Start process with MPS.\n")
     elif torch.cuda.is_available():
         print("[ INFO ] Start process with CUDA\n")
     else:
         print("[ INFO ] Start process with CPU\n")
-    # 训练计时开始
+    # Training time start.
     start_time = time.time()
     parser = argparse.ArgumentParser()
-    # 输入参数选项
+    # Input arguments and parametres.
     parser.add_argument(
         '--orig_images_path', type=str,
         default="training-image-AOD-net/images/"
@@ -254,7 +253,7 @@ if __name__ == "__main__":
     if not os.path.exists(config.sample_output_folder):
         os.mkdir(config.sample_output_folder)
     train(config)
-    # 训练计时结束
+    # Training time end.
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(

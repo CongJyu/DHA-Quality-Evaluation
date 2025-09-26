@@ -1,23 +1,23 @@
-# 从单色或灰度级图像快速恢复可见性 复现
-# 湖南大学 信息科学与工程学院 通信工程 陈昶宇
+# Reproduction of Restore Visibility from Single Colour or Gray-Scale Images method
+# Rain CongJyu CHEN
 
-# 计算机视觉及数据处理包
+# Import computer vision libraries.
 import cv2
 import numpy as np
 import os
 
 
-# 对图像进行白平衡处理
+# Make white balance process.
 def white_balance(image):
     '''
-    :param image: 读取的图像数据
-    :balanced_image: 返回的白平和结果图像
+    :param image: image data read.
+    :balanced_image: white balanced image return.
     '''
     red, green, blue = cv2.split(image)
     red_avg = cv2.mean(red)[0]
     green_avg = cv2.mean(green)[0]
     blue_avg = cv2.mean(blue)[0]
-    # 每个通道所占增益
+    # Gain of each channels.
     k = (red_avg + green_avg + blue_avg) / 3
     k_red = k / red_avg
     k_green = k / green_avg
@@ -52,8 +52,8 @@ def white_balance(image):
 
 def white_balance_old(img_input):
     '''
-    :param img: cv2.imread读取的图片数据
-    :return: 返回的白平衡结果图片数据
+    :param img: read image data from `cv2.imread`.
+    :return: white balanced image return.
     '''
     img = img_input.copy()
     b, g, r = cv2.split(img)
@@ -113,12 +113,13 @@ def white_balance_old(img_input):
     return img
 
 
-# 获取暗通道
+# Get dark channel.
 def get_dark_channel(img, size=20):
-    # size 是窗口的大小，窗口越大则包含暗通道的概率越大，暗通道就越黑
-    r, g, b = cv2.split(img)  # 把图像拆分出 R, G, B 三个通道
-    min_channel = cv2.min(r, cv2.min(g, b))  # 取出最小的通道
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))  # 矩形核
+    # `size` is the size of window. `size` is larger then the probability of the dark channel is larger,
+    # and the channel is darker.
+    r, g, b = cv2.split(img)  # Split image into three channels.
+    min_channel = cv2.min(r, cv2.min(g, b))  # Fetch the minimum channel.
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))  # Rectangle Kernel.
     dark_channel_img = cv2.erode(min_channel, kernel)
     dark_channel_img = cv2.merge(
         [
@@ -130,8 +131,8 @@ def get_dark_channel(img, size=20):
     return dark_channel_img
 
 
-# 推断大气面纱 Atmosphere Veil
-# 计算图像 W(x, y) = min(I(x, y))，即获取图像的最小通道
+# Predict atmosphere veil (AV).
+# Calculate W(x, y) = min(I(x, y)), and get the minimum channel.
 def get_min_channel(image):
     red, green, blue = cv2.split(image)
     min_channel = cv2.min(red, cv2.min(green, blue))
@@ -150,10 +151,10 @@ def get_min_channel_fix(image):
     return img_gray
 
 
-# 获取大气面纱
+# Get atmosphere veil (AV).
 def get_atmos_veil(image, sv=41, p=0.95):
-    # sv 是中值滤波器的使用的方形窗口的大小
-    # 因子 p 在 [0, 1] 范围内，控制可见性恢复的强度
+    # `sv` is the rectangle window's size of the median filter.
+    # Factor `p` ranges from [0, 1], controlling the strength of the restoration of the visibility.
     w_xy = get_min_channel_fix(image)
     a_xy = cv2.medianBlur(np.uint8(w_xy), sv)
     b_xy = w_xy - a_xy
@@ -212,7 +213,7 @@ def color_correct(img, u):
     return img_CR
 
 
-# 去雾
+# Dehaze.
 def dehaze(img_input, img_output):
     original_image = cv2.imread(img_input)
     white_balanced_img = white_balance(original_image)
@@ -222,7 +223,7 @@ def dehaze(img_input, img_output):
     white_balanced_img = np.float32(white_balanced_img) / 255
     for i in range(3):
         dehazed_img[:, :, i] = (white_balanced_img[:, :, i] - veil) \
-            / (1 - veil)
+                               / (1 - veil)
     dehazed_img = dehazed_img / dehazed_img.max()
     dehazed_img = np.clip(dehazed_img, 0, 1)
     dehazed_img = np.uint8(dehazed_img * 255)
@@ -230,7 +231,7 @@ def dehaze(img_input, img_output):
     cv2.imwrite(img_output, dehazed_img)
 
 
-# 数据集测试
+# Test the dataset.
 def dehaze_test(input_path, output_path):
     input_path_list = os.listdir(input_path)
     if ".DS_Store" in input_path_list:
@@ -246,7 +247,7 @@ def dehaze_test(input_path, output_path):
         dehaze(input_hazed_image, output_dehazed_image)
 
 
-# 数据集评估
+# Evaluate the dataset.
 # def dehaze_evaluate(input_path, output_path):
 #     input_path_list = os.listdir(input_path)
 #     if ".DS_Store" in input_path_list:
@@ -275,7 +276,7 @@ def dehaze_test(input_path, output_path):
 #         print(file_name, "\t", current_psnr, "\t", current_ssim)
 
 
-# 保存大气面纱图像
+# Store the image of atmosphere veil.
 def save_veil(input_path, output_path):
     input_path_list = os.listdir(input_path)
     if ".DS_Store" in input_path_list:
@@ -293,7 +294,7 @@ def save_veil(input_path, output_path):
         cv2.imwrite(output_dehazed_image, veil_image)
 
 
-# 保存白平衡处理后的图像
+# Store the image of white balanced immage.
 def save_white_balanced_image(input_path, output_path):
     input_path_list = os.listdir(input_path)
     if ".DS_Store" in input_path_list:
