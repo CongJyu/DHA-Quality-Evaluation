@@ -4,7 +4,6 @@
 # Use Python 3.10, with package manager and project manager `uv`.
 
 import os
-import time
 
 
 if __name__ == "__main__":
