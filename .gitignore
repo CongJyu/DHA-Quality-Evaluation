@@ -9,6 +9,10 @@ wheels/
 # Virtual environments
 .venv
 
+# IDEs
+.vscode
+.idea
+
 # macOS index files
 *.DS_Store
 
