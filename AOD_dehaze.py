@@ -1,9 +1,9 @@
-# AOD-Net 端到端去雾网络 复现
-# 湖南大学 信息科学与工程学院 通信工程 陈昶宇
+# The Reproduction of the AOD-Net End-to-End Dehazing Network.
+# Rain CongJyu CHEN
 
-# 参考 https://github.com/MayankSingal/PyTorch-Image-Dehazing 代码进行修改
+# Refs: https://github.com/MayankSingal/PyTorch-Image-Dehazing
 
-# AOD-Net 去雾程序
+# AOD-Net Dehazing Program
 
 import torch
 import torchvision
@@ -11,8 +11,7 @@ import numpy as np
 from PIL import Image
 import glob
 
-
-# 设置训练 AOD-Net 使用的设备
+# Set the training device for AOD-Net.
 if torch.mps.is_available():
     training_device = torch.device("mps")
 elif torch.cuda.is_available():
@@ -65,7 +64,7 @@ def dehaze_image(image_path):
     )
 
 
-# 数据集评估
+# Evaluation of the datasets.
 # def dehaze_evaluate(input_path, output_path):
 #     input_path_list = os.listdir(input_path)
 #     if ".DS_Store" in input_path_list:
@@ -95,7 +94,7 @@ def dehaze_image(image_path):
 
 
 if __name__ == "__main__":
-    # 设备提示
+    # Notice for devices.
     if torch.mps.is_available():
         print("[ INFO ] Start process with MPS.\n")
     elif torch.cuda.is_available():

@@ -1,6 +1,5 @@
-# 图像去雾质量评价 FR-IQA 实现
-# 湖南大学 信息科学与工程学院 通信工程 陈昶宇
-
+# The implementation of FR-IQA method.
+# Rain CongJyu CHEN
 
 import numpy as np
 import cv2
@@ -13,7 +12,7 @@ def is_size_match(file_list_1, file_list_2):
     return len(file_list_1) == len(file_list_2)
 
 
-# 评估均方误差 MSE
+# Calculate MSE
 def get_mse(original_image_dir, dehazed_image_dir, result_save_dir):
     original_image_list = os.listdir(original_image_dir)
     if ".DS_Store" in original_image_list:
@@ -28,7 +27,7 @@ def get_mse(original_image_dir, dehazed_image_dir, result_save_dir):
         print("[ FAIL ] Original image path is empty.")
         return -1
 
-    # 检查去雾后的图像个数与原无雾图像个数是否对应
+    # Check if the number of dehazed images is the same as hazed images.
     if is_size_match(original_image_list, dehazed_image_list):
         print("[ INFO ] File list check passed.")
     else:
@@ -46,10 +45,10 @@ def get_mse(original_image_dir, dehazed_image_dir, result_save_dir):
             os.path.join(dehazed_image_dir, file_name)
         )
 
-        # 转换成灰度图像
+        # Convert to gray scale image.
         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
         dehazed_image = cv2.cvtColor(dehazed_image, cv2.COLOR_BGR2GRAY)
-        # 计算 MSE
+        # Calculate MSE
         current_mse = np.round(
             np.sum(
                 cv2.subtract(original_image, dehazed_image) ** 2
@@ -67,7 +66,7 @@ def get_mse(original_image_dir, dehazed_image_dir, result_save_dir):
         )
 
 
-# 评估峰值信噪比 PSNR
+# Evaluate PSNR
 def get_psnr(original_image_dir, dehazed_image_dir, result_save_dir):
     original_image_list = os.listdir(original_image_dir)
     if ".DS_Store" in original_image_list:
@@ -85,7 +84,7 @@ def get_psnr(original_image_dir, dehazed_image_dir, result_save_dir):
     psnr_result = []
     cols = ["Image File", "PSNR"]
 
-    # 检查去雾后的图像个数与原无雾图像个数是否对应
+    # Check if the number of dehazed images is the same as hazed images.
     if is_size_match(original_image_list, dehazed_image_list):
         print("[ INFO ] File list check passed.")
     else:
@@ -115,7 +114,7 @@ def get_psnr(original_image_dir, dehazed_image_dir, result_save_dir):
         )
 
 
-# 评估结构相似度 SSIM
+# Evaluate SSIM
 def get_ssim(original_image_dir, dehazed_image_dir, result_save_dir):
     original_image_list = os.listdir(original_image_dir)
     if ".DS_Store" in original_image_list:
@@ -133,7 +132,7 @@ def get_ssim(original_image_dir, dehazed_image_dir, result_save_dir):
     ssim_result = []
     cols = ["Image File", "SSIM"]
 
-    # 检查去雾后的图像个数与原无雾图像个数是否对应
+    # Check if the number of dehazed images is the same as hazed images.
     if is_size_match(original_image_list, dehazed_image_list):
         print("[ INFO ] File list check passed.")
     else:
@@ -165,7 +164,7 @@ def get_ssim(original_image_dir, dehazed_image_dir, result_save_dir):
 
 
 if __name__ == "__main__":
-    # 暗通道先验去雾
+    # DCP dehaze.
     get_mse(
         original_image_dir="./test-data-dcp/GT",
         dehazed_image_dir="./test-data-dcp/dehazed",
@@ -181,7 +180,7 @@ if __name__ == "__main__":
         dehazed_image_dir="./test-data-dcp/dehazed",
         result_save_dir="./test-data-dcp/evaluate"
     )
-    # 快速恢复单色或灰度图像可见性
+    # FVR dehaze.
     get_mse(
         original_image_dir="./test-data-fvr/GT",
         dehazed_image_dir="./test-data-fvr/dehazed",
@@ -197,7 +196,7 @@ if __name__ == "__main__":
         dehazed_image_dir="./test-data-fvr/dehazed",
         result_save_dir="./test-data-fvr/evaluate"
     )
-    # AOD-Net
+    # AOD-Net dehaze
     get_mse(
         original_image_dir="./test-data-aod/GT",
         dehazed_image_dir="./test-data-aod/dehazed",
@@ -213,7 +212,7 @@ if __name__ == "__main__":
         dehazed_image_dir="./test-data-aod/dehazed",
         result_save_dir="./test-data-aod/evaluate"
     )
-    # 直方图均衡化图像增强
+    # Histogram Enhancement dehaze.
     get_mse(
         original_image_dir="./test-data-hist/GT",
         dehazed_image_dir="./test-data-hist/dehazed",
