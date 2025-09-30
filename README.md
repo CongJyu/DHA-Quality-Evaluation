@@ -62,7 +62,7 @@ projects. Here are the steps.
 #### Install the proper version of Python
 
 ```shell
-uv python install 3.10
+uv python install 3.13
 ```
 
 #### Create a virtual environment
@@ -70,11 +70,11 @@ uv python install 3.10
 If you use PyCharm, you can simply create a virtual environment for this project in GUI through `uv`; if you use other
 IDEs, you can also use `uv` command line to create a virtual environment.
 
-This project is based on Python 3.10, so just install the specific verison if you don't have Python 3.10 installed in
+This project is based on Python 3.13, so just install the specific verison if you don't have Python 3.13 installed in
 your computer.
 
 ```shell
-uv venv --python 3.10
+uv venv --python 3.13
 ```
 
 #### Install the requirements
