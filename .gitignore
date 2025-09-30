@@ -17,6 +17,7 @@ wheels/
 *.DS_Store
 
 # Datasets
+AOD-net-snapshots/
 samples/
 training-image-AOD-net/
 test-data-dcp/
