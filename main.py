@@ -1,7 +1,7 @@
 # The Quality Evaluation of Image Dehazing Algorithms
 # Rain CongJyu CHEN
 
-# Use Python 3.10, with package manager and project manager `uv`.
+# Use Python 3.13, with package manager and project manager `uv`.
 
 import os
 
