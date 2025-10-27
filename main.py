@@ -8,8 +8,8 @@ import os
 if __name__ == "__main__":
     print("[ INFO ] This is the DHA-Quality-Evaluation project.")
 
-    # print("[ INFO ] Start training AOD-Net... This may take a while...")
-    # os.system("uv run AOD_train.py")
+    print("[ INFO ] Start training AOD-Net... This may take a while...")
+    os.system("uv run AOD_train.py")
 
     print("[ INFO ] Using Dark Channel Prior Method for Dehazing.")
     os.system("uv run dark_channel_prior.py")
