@@ -58,6 +58,7 @@ def get_mse(original_image_dir, dehazed_image_dir, result_save_dir):
         result = pandas.DataFrame(columns=cols, data=mse_result)
         print("[ DEBUG ] MSE Result CSV:\n", result)
         result.to_csv(os.path.join(result_save_dir, "FR_IQA_MSE.csv"), encoding="UTF-8")
+    return None
 
 
 # Evaluate PSNR
@@ -103,6 +104,7 @@ def get_psnr(original_image_dir, dehazed_image_dir, result_save_dir):
         result.to_csv(
             os.path.join(result_save_dir, "FR_IQA_PSNR.csv"), encoding="UTF-8"
         )
+    return None
 
 
 # Evaluate SSIM
@@ -131,8 +133,8 @@ def get_ssim(original_image_dir, dehazed_image_dir, result_save_dir):
         return -1
 
     for file_name in dehazed_image_list:
-        original_image = cv2.imread(os.path.join(original_image_dir, file_name))
-        dehazed_image = cv2.imread(os.path.join(dehazed_image_dir, file_name))
+        original_image = cv2.imread(os.path.join(original_image_dir, str(file_name)))
+        dehazed_image = cv2.imread(os.path.join(dehazed_image_dir, str(file_name)))
         current_ssim = np.round(
             skimage.metrics.structural_similarity(
                 original_image,
@@ -151,6 +153,7 @@ def get_ssim(original_image_dir, dehazed_image_dir, result_save_dir):
         result.to_csv(
             os.path.join(result_save_dir, "FR_IQA_SSIM.csv"), encoding="UTF-8"
         )
+    return None
 
 
 if __name__ == "__main__":

@@ -22,9 +22,10 @@ else:
 
 
 # AOD_net
-class aod_dehaze_net(torch.nn.Module):
-    def __init__(self):
-        super(aod_dehaze_net, self).__init__()
+class AODDehazeNet(torch.nn.Module):
+    def __init__(self, *args, **kwargs):
+        super(AODDehazeNet, self).__init__()
+        super().__init__(*args, **kwargs)
         self.relu = torch.nn.ReLU(inplace=True)
         self.e_conv1 = torch.nn.Conv2d(3, 3, 1, 1, 0, bias=True)
         self.e_conv2 = torch.nn.Conv2d(3, 3, 3, 1, 1, bias=True)
@@ -33,8 +34,7 @@ class aod_dehaze_net(torch.nn.Module):
         self.e_conv5 = torch.nn.Conv2d(12, 3, 3, 1, 1, bias=True)
 
     def forward(self, x):
-        source = []
-        source.append(x)
+        # source = [x]
         x1 = self.relu(self.e_conv1(x))
         x2 = self.relu(self.e_conv2(x1))
         concat1 = torch.cat((x1, x2), 1)
@@ -55,7 +55,7 @@ def dehaze_image(image_path):
     # data_hazy = data_hazy.cpu().unsqueeze(0)
     data_hazy = data_hazy.to(training_device).unsqueeze(0)
     # dehaze_net = AOD_net.dehaze_net().cpu()
-    dehaze_net = aod_dehaze_net().to(training_device)
+    dehaze_net = AODDehazeNet().to(training_device)
     dehaze_net.load_state_dict(torch.load("AOD-net-snapshots/dehazer.pth"))
     clean_image = dehaze_net(data_hazy)
     # torchvision.utils.save_image(torch.cat(

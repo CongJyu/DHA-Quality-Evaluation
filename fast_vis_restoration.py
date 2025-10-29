@@ -38,7 +38,7 @@ def white_balance(image):
 
 def white_balance_old(img_input):
     """
-    :param img: read image data from `cv2.imread`.
+    :param img_input: read image data from `cv2.imread`.
     :return: white balanced image return.
     """
     img = img_input.copy()
@@ -124,11 +124,11 @@ def get_min_channel_fix(image):
     img_gray = np.zeros((image.shape[0], image.shape[1]), np.float32)
     for i in range(0, image.shape[0]):
         for j in range(0, image.shape[1]):
-            localMin = 255
+            local_min = 255
             for k in range(0, 2):
-                if image.item((i, j, k)) < localMin:
-                    localMin = image.item((i, j, k))
-            img_gray[i, j] = localMin
+                if image.item((i, j, k)) < local_min:
+                    local_min = image.item((i, j, k))
+            img_gray[i, j] = local_min
     return img_gray
 
 
@@ -171,27 +171,27 @@ def get_atmos_veil(image, sv=41, p=0.95):
 
 def color_correct(img, u):
     img = np.float64(img) / 255
-    B_mse = np.std(img[:, :, 0])
-    G_mse = np.std(img[:, :, 1])
-    R_mse = np.std(img[:, :, 2])
+    b_mse = np.std(img[:, :, 0])
+    g_mse = np.std(img[:, :, 1])
+    r_mse = np.std(img[:, :, 2])
 
-    B_max = np.mean(img[:, :, 0]) + u * B_mse
-    G_max = np.mean(img[:, :, 1]) + u * G_mse
-    R_max = np.mean(img[:, :, 2]) + u * R_mse
+    b_max = np.mean(img[:, :, 0]) + u * b_mse
+    g_max = np.mean(img[:, :, 1]) + u * g_mse
+    r_max = np.mean(img[:, :, 2]) + u * r_mse
 
-    B_min = np.mean(img[:, :, 0]) - u * B_mse
-    G_min = np.mean(img[:, :, 1]) - u * G_mse
-    R_min = np.mean(img[:, :, 2]) - u * R_mse
+    b_min = np.mean(img[:, :, 0]) - u * b_mse
+    g_min = np.mean(img[:, :, 1]) - u * g_mse
+    r_min = np.mean(img[:, :, 2]) - u * r_mse
 
-    B_cr = (img[:, :, 0] - B_min) / (B_max - B_min)
-    G_cr = (img[:, :, 1] - G_min) / (G_max - G_min)
-    R_cr = (img[:, :, 2] - R_min) / (R_max - R_min)
+    b_cr = (img[:, :, 0] - b_min) / (b_max - b_min)
+    g_cr = (img[:, :, 1] - g_min) / (g_max - g_min)
+    r_cr = (img[:, :, 2] - r_min) / (r_max - r_min)
 
-    img_CR = cv2.merge([B_cr, G_cr, R_cr]) * 255
-    img_CR = np.clip(img_CR, 0, 255)
-    img_CR = np.uint8(img_CR)
+    img_cr = cv2.merge([b_cr, g_cr, r_cr]) * 255
+    img_cr = np.clip(img_cr, 0, 255)
+    img_cr = np.uint8(img_cr)
 
-    return img_CR
+    return img_cr
 
 
 # Dehaze.
