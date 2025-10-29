@@ -9,10 +9,10 @@ import os
 
 # Make white balance process.
 def white_balance(image):
-    '''
+    """
     :param image: image data read.
     :balanced_image: white balanced image return.
-    '''
+    """
     red, green, blue = cv2.split(image)
     red_avg = cv2.mean(red)[0]
     green_avg = cv2.mean(green)[0]
@@ -119,7 +119,8 @@ def get_dark_channel(img, size=20):
     # and the channel is darker.
     r, g, b = cv2.split(img)  # Split image into three channels.
     min_channel = cv2.min(r, cv2.min(g, b))  # Fetch the minimum channel.
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))  # Rectangle Kernel.
+    # Rectangle Kernel.
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
     dark_channel_img = cv2.erode(min_channel, kernel)
     dark_channel_img = cv2.merge(
         [
@@ -223,7 +224,7 @@ def dehaze(img_input, img_output):
     white_balanced_img = np.float32(white_balanced_img) / 255
     for i in range(3):
         dehazed_img[:, :, i] = (white_balanced_img[:, :, i] - veil) \
-                               / (1 - veil)
+            / (1 - veil)
     dehazed_img = dehazed_img / dehazed_img.max()
     dehazed_img = np.clip(dehazed_img, 0, 1)
     dehazed_img = np.uint8(dehazed_img * 255)

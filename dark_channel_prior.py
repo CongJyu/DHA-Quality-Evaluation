@@ -11,9 +11,11 @@ def get_dark_channel(img, size=20):
     # `size` is the size of the window.
     # The larger the window, the greater the probability of containing a dark channel,
     # and the darker the dark channel.
-    r, g, b = cv2.split(img)  # Split the image into three channels: R, G, and B.
+    # Split the image into three channels: R, G, and B.
+    r, g, b = cv2.split(img)
     min_channel = cv2.min(r, cv2.min(g, b))  # Take out the smallest channel.
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))  # Rectangle kernel.
+    # Rectangle kernel.
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
     dark_channel_img = cv2.erode(min_channel, kernel)
     return dark_channel_img
 
@@ -83,7 +85,7 @@ def dehaze(img_input, img_output):
     result = np.empty_like(img)
     for i in range(3):
         result[:, :, i] = (img[:, :, i] - atmos_light) / \
-                          trans_guided + atmos_light
+            trans_guided + atmos_light
     cv2.imwrite(img_output, result * 255)
 
 
