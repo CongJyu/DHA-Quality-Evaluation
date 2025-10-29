@@ -48,14 +48,14 @@ class aod_dehaze_net(torch.nn.Module):
 
 def dehaze_image(image_path):
     data_hazy = Image.open(image_path)
-    data_hazy = (np.asarray(data_hazy) / 255.0)
+    data_hazy = np.asarray(data_hazy) / 255.0
     data_hazy = torch.from_numpy(data_hazy).float()
     data_hazy = data_hazy.permute(2, 0, 1)
     # data_hazy = data_hazy.cpu().unsqueeze(0)
     data_hazy = data_hazy.to(training_device).unsqueeze(0)
     # dehaze_net = AOD_net.dehaze_net().cpu()
     dehaze_net = aod_dehaze_net().to(training_device)
-    dehaze_net.load_state_dict(torch.load('AOD-net-snapshots/dehazer.pth'))
+    dehaze_net.load_state_dict(torch.load("AOD-net-snapshots/dehazer.pth"))
     clean_image = dehaze_net(data_hazy)
     # torchvision.utils.save_image(torch.cat(
     #     (data_hazy, clean_image), 0), "results/" + image_path.split("/")[-1])

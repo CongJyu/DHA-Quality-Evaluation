@@ -69,9 +69,7 @@ def populate_train_list(orig_images_path, hazy_images_path):
         else:
             for hazy_image in tmp_dict[key]:
                 # `val_list` is the path to clear images and hazed images.
-                val_list.append(
-                    [orig_images_path + key, hazy_images_path + hazy_image]
-                )
+                val_list.append([orig_images_path + key, hazy_images_path + hazy_image])
     # Shuffle the training set and the testing set.
     random.shuffle(train_list)
     random.shuffle(val_list)
@@ -99,8 +97,8 @@ class dehazing_loader(torch.utils.data.Dataset):
         # data_hazy = data_hazy.resize((480, 640), Image.ANTIALIAS)
         data_orig = data_orig.resize((480, 640), Image.Resampling.LANCZOS)
         data_hazy = data_hazy.resize((480, 640), Image.Resampling.LANCZOS)
-        data_orig = (np.asarray(data_orig) / 255.0)
-        data_hazy = (np.asarray(data_hazy) / 255.0)
+        data_orig = np.asarray(data_orig) / 255.0
+        data_hazy = np.asarray(data_hazy) / 255.0
         data_orig = torch.from_numpy(data_orig).float()
         data_hazy = torch.from_numpy(data_hazy).float()
         return data_orig.permute(2, 0, 1), data_hazy.permute(2, 0, 1)
@@ -137,9 +135,9 @@ class aod_dehaze_net(torch.nn.Module):
 
 def weights_init(m):
     classname = m.__class__.__name__
-    if classname.find('Conv') != -1:
+    if classname.find("Conv") != -1:
         m.weight.data.normal_(0.0, 0.02)
-    elif classname.find('BatchNorm') != -1:
+    elif classname.find("BatchNorm") != -1:
         m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0)
 
@@ -148,26 +146,28 @@ def train(config):
     # dehaze_net = AOD_net.dehaze_net().cpu()
     dehaze_net = aod_dehaze_net().to(training_device)
     dehaze_net.apply(weights_init)
-    train_dataset = dehazing_loader(
-        config.orig_images_path, config.hazy_images_path
-    )
+    train_dataset = dehazing_loader(config.orig_images_path, config.hazy_images_path)
     val_dataset = dehazing_loader(
         config.orig_images_path, config.hazy_images_path, mode="val"
     )
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=config.train_batch_size,
-        shuffle=True, num_workers=config.num_workers, pin_memory=True
+        train_dataset,
+        batch_size=config.train_batch_size,
+        shuffle=True,
+        num_workers=config.num_workers,
+        pin_memory=True,
     )
     val_loader = torch.utils.data.DataLoader(
-        val_dataset, batch_size=config.val_batch_size,
-        shuffle=True, num_workers=config.num_workers, pin_memory=True
+        val_dataset,
+        batch_size=config.val_batch_size,
+        shuffle=True,
+        num_workers=config.num_workers,
+        pin_memory=True,
     )
     # criterion = torch.nn.MSELoss().cpu()
     criterion = torch.nn.MSELoss().to(training_device)
     optimizer = torch.optim.Adam(
-        dehaze_net.parameters(),
-        lr=config.lr,
-        weight_decay=config.weight_decay
+        dehaze_net.parameters(), lr=config.lr, weight_decay=config.weight_decay
     )
     dehaze_net.train()
     for epoch in range(config.num_epochs):
@@ -182,19 +182,21 @@ def train(config):
             optimizer.zero_grad()
             loss.backward()
             torch.nn.utils.clip_grad_norm_(
-                dehaze_net.parameters(),
-                config.grad_clip_norm
+                dehaze_net.parameters(), config.grad_clip_norm
             )
             optimizer.step()
             if ((iteration + 1) % config.display_iter) == 0:
                 print(
                     f"[ INFO ] Current epoch: {epoch}",
-                    ", Loss at iteration", iteration + 1, ":", loss.item()
+                    ", Loss at iteration",
+                    iteration + 1,
+                    ":",
+                    loss.item(),
                 )
             if ((iteration + 1) % config.snapshot_iter) == 0:
                 torch.save(
                     dehaze_net.state_dict(),
-                    config.snapshots_folder + "Epoch" + str(epoch) + '.pth'
+                    config.snapshots_folder + "Epoch" + str(epoch) + ".pth",
                 )
         # Validation Stage
         for iter_val, (img_orig, img_haze) in enumerate(val_loader):
@@ -205,12 +207,9 @@ def train(config):
             clean_image = dehaze_net(img_haze)
             torchvision.utils.save_image(
                 torch.cat((img_haze, clean_image, img_orig), 0),
-                config.sample_output_folder + str(iter_val + 1) + ".jpg"
+                config.sample_output_folder + str(iter_val + 1) + ".jpg",
             )
-        torch.save(
-            dehaze_net.state_dict(),
-            config.snapshots_folder + "dehazer.pth"
-        )
+        torch.save(dehaze_net.state_dict(), config.snapshots_folder + "dehazer.pth")
 
 
 if __name__ == "__main__":
@@ -226,27 +225,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Input arguments and parametres.
     parser.add_argument(
-        '--orig_images_path', type=str,
-        default="training-image-AOD-net/images/"
+        "--orig_images_path", type=str, default="training-image-AOD-net/images/"
     )
     parser.add_argument(
-        '--hazy_images_path', type=str,
-        default="training-image-AOD-net/data/"
+        "--hazy_images_path", type=str, default="training-image-AOD-net/data/"
     )
-    parser.add_argument('--lr', type=float, default=0.0001)
-    parser.add_argument('--weight_decay', type=float, default=0.0001)
-    parser.add_argument('--grad_clip_norm', type=float, default=0.1)
-    parser.add_argument('--num_epochs', type=int, default=10)
-    parser.add_argument('--train_batch_size', type=int, default=8)
-    parser.add_argument('--val_batch_size', type=int, default=8)
-    parser.add_argument('--num_workers', type=int, default=4)
-    parser.add_argument('--display_iter', type=int, default=10)
-    parser.add_argument('--snapshot_iter', type=int, default=200)
-    parser.add_argument(
-        '--snapshots_folder', type=str,
-        default="AOD-net-snapshots/"
-    )
-    parser.add_argument('--sample_output_folder', type=str, default="samples/")
+    parser.add_argument("--lr", type=float, default=0.0001)
+    parser.add_argument("--weight_decay", type=float, default=0.0001)
+    parser.add_argument("--grad_clip_norm", type=float, default=0.1)
+    parser.add_argument("--num_epochs", type=int, default=10)
+    parser.add_argument("--train_batch_size", type=int, default=8)
+    parser.add_argument("--val_batch_size", type=int, default=8)
+    parser.add_argument("--num_workers", type=int, default=4)
+    parser.add_argument("--display_iter", type=int, default=10)
+    parser.add_argument("--snapshot_iter", type=int, default=200)
+    parser.add_argument("--snapshots_folder", type=str, default="AOD-net-snapshots/")
+    parser.add_argument("--sample_output_folder", type=str, default="samples/")
     config = parser.parse_args()
     if not os.path.exists(config.snapshots_folder):
         os.mkdir(config.snapshots_folder)
@@ -256,6 +250,4 @@ if __name__ == "__main__":
     # Training time end.
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(
-        f"[ INFO ] Training done. Elapsed time is {elapsed_time:.2f} second(s)."
-    )
+    print(f"[ INFO ] Training done. Elapsed time is {elapsed_time:.2f} second(s).")
