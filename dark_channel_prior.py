@@ -33,7 +33,7 @@ def get_atmos_light(img, percent=0.001):
     mean_per_pixel = np.mean(img, axis=2).reshape(-1)
     # Select the brightest percent pixels.
     mean_per_pixel = np.sort(mean_per_pixel)[::-1]
-    mean_top = mean_per_pixel[:int(img.shape[0] * img.shape[1] * percent)]
+    mean_top = mean_per_pixel[: int(img.shape[0] * img.shape[1] * percent)]
     return np.mean(mean_top)
 
 
@@ -81,11 +81,11 @@ def dehaze(img_input, img_output):
     atmos_light = get_atmos_light(img)
     trans = get_trans(img, atmos_light)
     trans_guided = guided_filter(trans, img_gray, 20, 0.0001)
+    # TODO: fix here.
     trans_guided = cv2.max(trans_guided, 0.25)
     result = np.empty_like(img)
     for i in range(3):
-        result[:, :, i] = (img[:, :, i] - atmos_light) / \
-            trans_guided + atmos_light
+        result[:, :, i] = (img[:, :, i] - atmos_light) / trans_guided + atmos_light
     cv2.imwrite(img_output, result * 255)
 
 
@@ -166,8 +166,7 @@ def save_dark_channel_image(input_path, output_path):
 
 if __name__ == "__main__":
     dehaze_test(
-        input_path="./test-data-dcp/hazy",
-        output_path="./test-data-dcp/dehazed"
+        input_path="./test-data-dcp/hazy", output_path="./test-data-dcp/dehazed"
     )
     # dehaze_evaluate(
     #     input_path="./test-data-dcp/hazy",
@@ -175,7 +174,7 @@ if __name__ == "__main__":
     # )
     save_dark_channel_image(
         input_path="./test-data-dcp/hazy",
-        output_path="./test-data-dcp/dark-channel-prior"
+        output_path="./test-data-dcp/dark-channel-prior",
     )
     # dehaze_test(
     #     input_path="./hazed-image",
