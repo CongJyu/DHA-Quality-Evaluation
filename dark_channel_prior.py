@@ -1,9 +1,10 @@
 # Reproduction of Dark Channel Prior Method
 # Rain CongJyu CHEN
 
+import os
+
 import cv2
 import numpy as np
-import os
 
 
 # Compute the dark channel according to Kaiming He's paper.

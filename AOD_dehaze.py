@@ -5,11 +5,12 @@
 
 # AOD-Net Dehazing Program
 
+import glob
+
+import numpy as np
 import torch
 import torchvision
-import numpy as np
 from PIL import Image
-import glob
 
 # Set the training device for AOD-Net.
 if torch.mps.is_available():

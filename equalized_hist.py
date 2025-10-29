@@ -1,8 +1,9 @@
 # Reproduction of Histogram Equalization Dehazing Method
 # Rain CongJyu CHEN
 
-import cv2
 import os
+
+import cv2
 
 
 # Traditional image enhancement methods.

@@ -1,11 +1,12 @@
 # The Implementation of FR-IQA Method
 # Rain CongJyu CHEN
 
-import numpy as np
-import cv2
 import os
-import skimage
+
+import cv2
+import numpy as np
 import pandas
+import skimage
 
 
 def is_size_match(file_list_1, file_list_2):

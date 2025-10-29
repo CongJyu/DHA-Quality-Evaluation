@@ -1,10 +1,12 @@
 # Reproduction of Restore Visibility from Single Colour or Gray-Scale Images Method
 # Rain CongJyu CHEN
 
+import os
+
 # Import computer vision libraries.
 import cv2
 import numpy as np
-import os
+
 
 # TODO: This method needs further improvement.
 
