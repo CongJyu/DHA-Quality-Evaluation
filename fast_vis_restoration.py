@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 import os
 
+# TODO: This method needs further improvement.
+
 
 # Make white balance process.
 def white_balance(image):
@@ -25,36 +27,18 @@ def white_balance(image):
     # red = red * k_red
     # green = green * k_green
     # blue = blue * k_blue
-    red = cv2.addWeighted(
-        src1=red,
-        alpha=k_red,
-        src2=0,
-        beta=0,
-        gamma=0
-    )
-    green = cv2.addWeighted(
-        src1=green,
-        alpha=k_green,
-        src2=0,
-        beta=0,
-        gamma=0
-    )
-    blue = cv2.addWeighted(
-        src1=blue,
-        alpha=k_blue,
-        src2=0,
-        beta=0,
-        gamma=0
-    )
+    red = cv2.addWeighted(src1=red, alpha=k_red, src2=0, beta=0, gamma=0)
+    green = cv2.addWeighted(src1=green, alpha=k_green, src2=0, beta=0, gamma=0)
+    blue = cv2.addWeighted(src1=blue, alpha=k_blue, src2=0, beta=0, gamma=0)
     balanced_image = cv2.merge([red, green, blue])
     return balanced_image
 
 
 def white_balance_old(img_input):
-    '''
+    """
     :param img: read image data from `cv2.imread`.
     :return: white balanced image return.
-    '''
+    """
     img = img_input.copy()
     b, g, r = cv2.split(img)
     m, n, t = img.shape
@@ -122,13 +106,7 @@ def get_dark_channel(img, size=20):
     # Rectangle Kernel.
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
     dark_channel_img = cv2.erode(min_channel, kernel)
-    dark_channel_img = cv2.merge(
-        [
-            dark_channel_img,
-            dark_channel_img,
-            dark_channel_img
-        ]
-    )
+    dark_channel_img = cv2.merge([dark_channel_img, dark_channel_img, dark_channel_img])
     return dark_channel_img
 
 
@@ -223,8 +201,7 @@ def dehaze(img_input, img_output):
     dehazed_img = np.zeros((veil.shape[0], veil.shape[1], 3), dtype=np.float32)
     white_balanced_img = np.float32(white_balanced_img) / 255
     for i in range(3):
-        dehazed_img[:, :, i] = (white_balanced_img[:, :, i] - veil) \
-            / (1 - veil)
+        dehazed_img[:, :, i] = (white_balanced_img[:, :, i] - veil) / (1 - veil)
     dehazed_img = dehazed_img / dehazed_img.max()
     dehazed_img = np.clip(dehazed_img, 0, 1)
     dehazed_img = np.uint8(dehazed_img * 255)
@@ -315,16 +292,11 @@ def save_white_balanced_image(input_path, output_path):
 
 if __name__ == "__main__":
     save_white_balanced_image(
-        input_path="./test-data-fvr/hazy",
-        output_path="./test-data-fvr/white-balanced"
+        input_path="./test-data-fvr/hazy", output_path="./test-data-fvr/white-balanced"
     )
-    save_veil(
-        input_path="./test-data-fvr/hazy",
-        output_path="./test-data-fvr/veil"
-    )
+    save_veil(input_path="./test-data-fvr/hazy", output_path="./test-data-fvr/veil")
     dehaze_test(
-        input_path="./test-data-fvr/hazy",
-        output_path="./test-data-fvr/dehazed"
+        input_path="./test-data-fvr/hazy", output_path="./test-data-fvr/dehazed"
     )
     # dehaze_test(
     #     input_path="./hazed-image",
